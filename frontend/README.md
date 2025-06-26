@@ -1,16 +1,66 @@
-# React + Vite
+##  Architecture Technique
+- **Backend** : Node.js + Express.js (MVC)
+- **Frontend** : React + Vite + Tailwind CSS
+- **Base de données** : MySQL + Prisma ORM
+- **Authentification** : JWT + Argon2
+- **Conteneurisation** : Docker 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+##  Rôles Utilisateurs
+- **RES** : Responsable d'agence (tous droits)
+- **CHG** : Chargé de risques (droits limités) 
+- **ADM** : Administrateur système
 
-Currently, two official plugins are available:
+##  Structure du Projet
+```
+LoanGuard/
+├── backend/
+│   ├── src/
+│   │   ├── controllers/     # Logique métier
+│   │   ├── middlewares/     # Middleware auth, validation
+│   │   ├── routes/          # Routes API
+│   │   └── utils/           # Utilitaires (JWT, etc.)
+│   └── prisma/
+│       ├── schema.prisma    # Schéma DB principal
+│       └── models/          # Modèles séparés
+└── frontend/
+    └── src/
+        ├── components/      # Composants réutilisables
+        ├── pages/          # Pages de l'application
+        └── services/       # Services API
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+##  Standards de Sécurité
+-  Argon2 pour hachage des mots de passe (PAS bcrypt)
+-  JWT pour l'authentification
+-  Validation des données côté serveur ET client
+-  Middleware d'authentification sur routes protégées
+-  Jamais de mots de passe en clair
 
-## Expanding the ESLint configuration
+##  Standards de Code
+- **Langue** : Variables et commentaires en français (contexte métier)
+- **Style** : Code propre, bien indenté, fonctions courtes
+- **Architecture** : MVC strict pour le backend
+- **Frontend** : Composants fonctionnels avec hooks React
+- **CSS** : Tailwind CSS uniquement
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+##  Installation et Démarrage
 
+### Backend
+```bash
+cd backend
+npm install
+npm install argon2 jsonwebtoken
+npx prisma generate
+npx prisma migrate dev
+npm run dev
+```
+
+### Frontend  
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 dans le dossier racine: 
 

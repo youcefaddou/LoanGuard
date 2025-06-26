@@ -9,3 +9,7 @@ back/.env
 front/.env
 # Prisma
 back/prisma/dev.db
+
+
+
+copilot-instructions.md

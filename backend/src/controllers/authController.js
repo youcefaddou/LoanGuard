@@ -8,7 +8,8 @@ exports.login = async (req, res) => {
       where: { email, role }
     });
     if (!user) return res.status(401).json({ message: 'Utilisateur non trouvé' });
-    const valid = await bcrypt.compare(password, user.password);
+    // je veux utiliser argon2 pour le hachage des mots de passe
+    // const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ message: 'Mot de passe incorrect' });
     // Générer un token JWT 
     return res.json({ message: 'Connexion réussie', user: { id: user.id, name: user.name, role: user.role } });
