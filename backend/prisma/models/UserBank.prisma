@@ -1,0 +1,9 @@
+model UserBank {
+  id      Int   @id @default(autoincrement())
+  userId  Int
+  bankId  Int
+  user    User  @relation(fields: [userId], references: [id])
+  bank    Bank  @relation(fields: [bankId], references: [id])
+
+  @@unique([userId, bankId])
+}

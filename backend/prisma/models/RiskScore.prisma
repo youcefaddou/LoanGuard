@@ -1,0 +1,7 @@
+model RiskScore {
+  id        Int      @id @default(autoincrement())
+  loanId    Int
+  score     Float
+  date      DateTime
+  loan      Loan     @relation(fields: [loanId], references: [id])
+}

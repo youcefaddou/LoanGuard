@@ -1,0 +1,7 @@
+model Payment {
+  id        Int      @id @default(autoincrement())
+  loanId    Int
+  amount    Float
+  date      DateTime
+  loan      Loan     @relation(fields: [loanId], references: [id])
+}

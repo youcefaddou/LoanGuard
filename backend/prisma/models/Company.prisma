@@ -1,0 +1,6 @@
+model Company {
+  id        Int     @id @default(autoincrement())
+  name      String
+  users     User[]
+  banks     Bank[]
+}

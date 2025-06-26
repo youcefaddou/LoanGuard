@@ -1,0 +1,8 @@
+model Alert {
+  id        Int      @id @default(autoincrement())
+  loanId    Int
+  type      String
+  message   String
+  date      DateTime
+  loan      Loan     @relation(fields: [loanId], references: [id])
+}

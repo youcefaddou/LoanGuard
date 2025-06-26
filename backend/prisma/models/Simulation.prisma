@@ -1,0 +1,8 @@
+model Simulation {
+  id        Int      @id @default(autoincrement())
+  loanId    Int
+  params    String   // JSON ou autre structure selon besoin
+  result    String
+  date      DateTime
+  loan      Loan     @relation(fields: [loanId], references: [id])
+}

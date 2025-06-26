@@ -1,0 +1,16 @@
+model Loan {
+  id            Int          @id @default(autoincrement())
+  userId        Int
+  bankId        Int
+  amount        Float
+  status        String
+  startDate     DateTime
+  endDate       DateTime
+  user          User         @relation(fields: [userId], references: [id])
+  bank          Bank         @relation(fields: [bankId], references: [id])
+  payments      Payment[]
+  riskScores    RiskScore[]
+  alerts        Alert[]
+  simulations   Simulation[]
+  reports       Report[]
+}

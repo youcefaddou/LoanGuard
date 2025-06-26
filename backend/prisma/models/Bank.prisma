@@ -1,0 +1,8 @@
+model Bank {
+  id         Int        @id @default(autoincrement())
+  name       String
+  companyId  Int
+  company    Company    @relation(fields: [companyId], references: [id])
+  userBanks  UserBank[]
+  loans      Loan[]
+}

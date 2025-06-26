@@ -1,0 +1,7 @@
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  action    String
+  date      DateTime
+  user      User     @relation(fields: [userId], references: [id])
+}
