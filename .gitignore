@@ -1,5 +1,11 @@
-node_modules
+# Node
+node_modules/
+# Env files
 .env
-backend/node_modules
-frontend/node_modules
 .env.local
+back/node_modules/
+front/node_modules/
+back/.env
+front/.env
+# Prisma
+back/prisma/dev.db
