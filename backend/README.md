@@ -20,6 +20,9 @@ ajouter dans package.json sous scripts du backend:
 creation des models prisma d'abord, ensuite: 
 npx prisma migrate dev
 
+npm install argon2 jsonwebtoken
+npm install cors
+
 
 
 
