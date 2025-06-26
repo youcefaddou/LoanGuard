@@ -3,6 +3,7 @@ Dans le dossier backend:
 npm init -y
 npm i express prisma
 npm install --save-dev nodemon
+npm i dotenv
 npx prisma init
 npm install @prisma/client
 
