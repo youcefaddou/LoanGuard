@@ -22,7 +22,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Routes d'authentification
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/authRoute');
 app.use('/api/auth', authRoutes);
 
 // Route de test pour vérifier que l'API fonctionne

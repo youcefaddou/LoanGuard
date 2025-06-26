@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { validateEmail, validatePassword } from '../services/validation';
 
 const Login = () => {
+  const navigate = useNavigate();
+  
   // État pour les données du formulaire
   const [role, setRole] = useState('CHG');
   const [email, setEmail] = useState('');
@@ -56,7 +59,7 @@ const Login = () => {
         },
         body: JSON.stringify({
           email: email,
-          motDePasse: password,
+          password: password,
           role: role
         }),
       })
@@ -65,9 +68,9 @@ const Login = () => {
 
       if (response.ok) {
         localStorage.setItem('token', result.token);
-        localStorage.setItem('utilisateur', JSON.stringify(result.utilisateur));
+        localStorage.setItem('', JSON.stringify(result.user));
         // Redirection vers le dashboard
-        window.location.href = '/dashboard';
+        navigate('/dashboard');
       } else {
         setError(result.message || 'Erreur de connexion');
       }

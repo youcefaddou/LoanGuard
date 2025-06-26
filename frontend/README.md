@@ -85,3 +85,5 @@ Pour le frontend (depuis le dossier frontend) :
 
 bash
 npm run dev
+
+npm install react-router-dom
