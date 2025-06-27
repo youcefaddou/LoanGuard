@@ -5,7 +5,7 @@ const authMiddleware = require('../middlewares/midAuth');
 
 // Routes d'authentification
 
-// Connexion/déconnexion utilisateur (RES, CHG, ADM)
+// Connexion/déconnexion utilisateur
 router.post('/login', authController.login);
 router.post('/logout', authMiddleware, authController.logout);
 

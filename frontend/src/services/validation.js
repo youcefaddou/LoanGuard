@@ -1,5 +1,5 @@
 // Service de validation simple pour le frontend
-// La validation sécurisée se fait côté backend
+//la validation sécurisée se fait côté backend
 
 export const validateEmail = (email) => {
   if (!email) {

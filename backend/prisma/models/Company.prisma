@@ -1,6 +1,13 @@
 model Company {
   id        Int     @id @default(autoincrement())
-  name      String
+  name      String   @db.VarChar(100)
+  siret     String   @db.VarChar(14) @unique
+  address   String   @db.VarChar(255)
+  zipCode   String   @db.VarChar(5)
+  city      String   @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bankId    Int
+  bank      Bank     @relation(fields: [bankId], references: [id])
   users     User[]
-  banks     Bank[]
 }

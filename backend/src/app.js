@@ -16,7 +16,6 @@ app.use(express.urlencoded({ extended: true }));
 // Middleware de logging pour développement
 if (process.env.NODE_ENV === 'development') {
   app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
     next();
   });
 }
@@ -24,6 +23,10 @@ if (process.env.NODE_ENV === 'development') {
 // Routes d'authentification
 const authRoutes = require('./routes/authRoute');
 app.use('/api/auth', authRoutes);
+
+// Routes de gestion des agences
+const bankRoutes = require('./routes/bankRoute');
+app.use('/api/banks', bankRoutes);
 
 // Route de test pour vérifier que l'API fonctionne
 app.get('/api/health', (req, res) => {

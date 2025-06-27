@@ -34,7 +34,7 @@ exports.login = async (req, res) => {
     const sanitizedEmail = email.toLowerCase().trim()
     const sanitizedRole = role.toUpperCase().trim()
 
-    // Recherche utilisateur avec Prisma
+    // Recherche user avec prisma
     const user = await prisma.user.findFirst({
       where: { 
         email: sanitizedEmail,
@@ -47,7 +47,7 @@ exports.login = async (req, res) => {
         message: 'Identifiants incorrects'})
     }
     
-    // Vérification mot de passe avec Argon2 
+    // verif mot de passe avec argon2 
     const isPasswordValid = await argon2.verify(
       user.password, 
       password
@@ -57,9 +57,20 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Identifiants incorrects'})
     }
     
-    // Vérification que le compte n'est pas désactivé
+    //Verification que le compte n'est pas désactivé
     if (user.isActive === false) {
       return res.status(403).json({ message: 'Compte désactivé. Contactez l\'administrateur'})
+    }
+
+    // recupération des agences associées à l'utilisateur (si RES)
+    let userBanks = [];
+    if (user.role === 'RES') {
+      userBanks = await prisma.userBank.findMany({
+        where: { userId: user.id },
+        include: { 
+          bank: true
+        }
+      });
     }
 
     // Génération token JWT sécurisé
@@ -73,18 +84,68 @@ exports.login = async (req, res) => {
       { expiresIn: '24h' }
     )
 
-    // Réponse JSON avec token et informations utilisateur
-    res.json({
-      message: 'Connexion réussie',
-      token,
-      user: {
-        id: user.id,
-        lastName: user.lastName,
-        firstName: user.firstName,
-        email: user.email,
-        role: user.role
+    // Logique de redirection selon le nombre d'agences
+    if (user.role === 'RES' && userBanks.length > 1) {
+      // Conversion des agences pour la réponse
+      const banksForResponse = [];
+      for (let i = 0; i < userBanks.length; i++) {
+        banksForResponse.push({
+          id: userBanks[i].bank.id,
+          name: userBanks[i].bank.name,
+          address: userBanks[i].bank.address,
+          city: userBanks[i].bank.city
+        });
       }
-    })
+      
+      // RES avec plusieurs agences -> sélection obligatoire
+      res.json({
+        message: 'Connexion réussie',
+        token,
+        user: {
+          id: user.id,
+          lastName: user.lastName,
+          firstName: user.firstName,
+          email: user.email,
+          role: user.role
+        },
+        requiresBankSelection: true,
+        banks: banksForResponse
+      });
+    } else if (user.role === 'RES' && userBanks.length === 1) {
+      // RES avec une seule agence -> accès direct
+      res.json({
+        message: 'Connexion réussie',
+        token,
+        user: {
+          id: user.id,
+          lastName: user.lastName,
+          firstName: user.firstName,
+          email: user.email,
+          role: user.role
+        },
+        requiresBankSelection: false,
+        selectedBank: {
+          id: userBanks[0].bank.id,
+          name: userBanks[0].bank.name,
+          address: userBanks[0].bank.address,
+          city: userBanks[0].bank.city
+        }
+      });
+    } else {
+      // CHG ou RES sans agence -> accès direct dashboard
+      res.json({
+        message: 'Connexion réussie',
+        token,
+        user: {
+          id: user.id,
+          lastName: user.lastName,
+          firstName: user.firstName,
+          email: user.email,
+          role: user.role
+        },
+        requiresBankSelection: false
+      });
+    }
     
   } catch (error) {
     console.error('Erreur connexion:', error)

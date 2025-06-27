@@ -69,8 +69,17 @@ const Login = () => {
       if (response.ok) {
         localStorage.setItem('token', result.token);
         localStorage.setItem('', JSON.stringify(result.user));
-        // Redirection vers le dashboard
-        navigate('/dashboard');
+        // Si RES avec plusieurs agences, redirect vers selection de la banque
+        if (result.requiresBankSelection) {
+          navigate('/select-bank');
+        } else {
+          if (result.selectedBank) {
+            localStorage.setItem('selectedBankId', result.selectedBank.id);
+            localStorage.setItem('selectedBank', JSON.stringify(result.selectedBank));
+          }
+          // Redirection vers le dashboard
+          navigate('/dashboard');
+        }
       } else {
         setError(result.message || 'Erreur de connexion');
       }
