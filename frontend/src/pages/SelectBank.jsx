@@ -44,7 +44,7 @@ const SelectBank = () => {
     fetchUserBanks();
   }, [navigate]);
 
-  // Sélection d'une agence
+  // selection d'une agence
   const handleBankSelection = (bank) => {
     localStorage.setItem('selectedBankId', bank.id);
     localStorage.setItem('selectedBank', JSON.stringify(bank));
