@@ -5,19 +5,19 @@ import LoanWatchlist from "../components/LoanWatchlist";
 import QuickActions from "../components/QuickActions";
 import RiskChart from "../components/RiskChart";
 import RiskMap from "../components/RiskMap";
+import Footer from "../components/Footer";
 
 const Dashboard = () => {
   return (
-    <div className="flex bg-gray-100">
+    <div className="flex h-screen bg-gray-100">
       <Sidebar />
 
       {/* Contenu principal */}
       <div className="flex-1 lg:ml-64 flex flex-col">
         <Header />
-        <main className="flex-1 p-2 sm:p-6 lg:p-4">
+        <main className="flex-1 p-2 sm:p-6 lg:p-4 overflow-auto">
           {/* Grid 2x2 pour les 4 containers */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 h-full">
-            
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 min-h-[calc(100vh-200px)]">
             {/* Container 1 - Top Left: Prêts à surveiller */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-[400px]">
               <LoanWatchlist />
@@ -37,9 +37,11 @@ const Dashboard = () => {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-[400px]">
               <QuickActions />
             </div>
-
           </div>
         </main>
+        
+        {/* Footer intégré dans la zone de contenu */}
+        <Footer />
       </div>
     </div>
   );

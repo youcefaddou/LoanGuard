@@ -303,7 +303,10 @@ const Header = () => {
 
                   {/* Version mobile (moins de sm) */}
                   <button
-                    onClick={() => setIsLogoutMenuOpen(!isLogoutMenuOpen)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsLogoutMenuOpen(!isLogoutMenuOpen);
+                    }}
                     className="sm:hidden bg-gray-100 border border-gray-300 text-gray-700 px-2 py-2 rounded-md hover:bg-gray-200 hover:border-gray-400 font-medium text-sm"
                   >
                     <ChevronDownIcon className="h-4 w-4" />
@@ -313,7 +316,8 @@ const Header = () => {
                   {isLogoutMenuOpen && (
                     <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 sm:hidden">
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           handleLogout();
                           setIsLogoutMenuOpen(false);
                         }}
