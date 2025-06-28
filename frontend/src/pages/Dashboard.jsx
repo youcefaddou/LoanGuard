@@ -1,25 +1,43 @@
 import React from "react";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+import LoanWatchlist from "../components/LoanWatchlist";
+import QuickActions from "../components/QuickActions";
+import RiskChart from "../components/RiskChart";
+import RiskMap from "../components/RiskMap";
 
 const Dashboard = () => {
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex bg-gray-100">
       <Sidebar />
 
       {/* Contenu principal */}
       <div className="flex-1 lg:ml-64 flex flex-col">
         <Header />
-        <main className="flex-1 p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">
-            Tableau de bord LoanGuard
-          </h1>
+        <main className="flex-1 p-2 sm:p-6 lg:p-4">
+          {/* Grid 2x2 pour les 4 containers */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 h-full">
+            
+            {/* Container 1 - Top Left: Prêts à surveiller */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-[400px]">
+              <LoanWatchlist />
+            </div>
 
-          {/* Zone de contenu temporaire */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <p className="text-gray-600">
-              Bienvenue sur votre dashboard ! Contenu à venir...
-            </p>
+            {/* Container 2 - Top Right: Carte des risques */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-[400px]">
+              <RiskMap />
+            </div>
+
+            {/* Container 3 - Bottom Left: Évolution des scores */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-[400px]">
+              <RiskChart />
+            </div>
+
+            {/* Container 4 - Bottom Right: Actions rapides */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-[400px]">
+              <QuickActions />
+            </div>
+
           </div>
         </main>
       </div>
