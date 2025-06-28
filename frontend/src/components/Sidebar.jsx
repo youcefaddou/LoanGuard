@@ -55,12 +55,13 @@ const Sidebar = () => {
 
   // Récupérer les données de l'utilisateur avec vérification
   const user = JSON.parse(localStorage.getItem("user"));
-  const userRole = user?.role;
-
+  
   // Si pas d'utilisateur connecté, ne pas afficher la sidebar
-  if (!user || !userRole) {
+  if (!user) {
     return null;
   }
+  
+  const userRole = user.role;
 
   const menuFilter = menuItems.filter((item) => item.roles.includes(userRole));
   const isActive = (route) => location.pathname === route;
