@@ -69,7 +69,7 @@ const Sidebar = () => {
     setIsMobileOpen(false);
   };
 
-  // Si aucun menu autorisé pour ce rôle
+  //si aucun menu autorisé pour ce role
   if (menuFilter.length === 0) {
     return null;
   }
