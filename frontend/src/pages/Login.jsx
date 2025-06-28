@@ -68,7 +68,7 @@ const Login = () => {
 
       if (response.ok) {
         localStorage.setItem('token', result.token);
-        localStorage.setItem('', JSON.stringify(result.user));
+        localStorage.setItem('user', JSON.stringify(result.user));
         // Si RES avec plusieurs agences, redirect vers selection de la banque
         if (result.requiresBankSelection) {
           navigate('/select-bank');
