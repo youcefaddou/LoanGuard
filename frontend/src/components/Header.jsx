@@ -1,56 +1,58 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
+import authService from "../services/authService"
 import {
   BellIcon,
   ChevronDownIcon,
   Bars3Icon,
   XMarkIcon,
-} from "@heroicons/react/24/outline";
+} from "@heroicons/react/24/outline"
+
 
 const Header = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  //récuperer les données de l'user
-  const user = JSON.parse(localStorage.getItem("user"));
-  const selectedBank = JSON.parse(localStorage.getItem("selectedBank"));
+  //récuperer les données de l'user depuis le service
+  const user = authService.getCurrentUser()
+  //récuperer les données de la banque sélectionnée
+  const selectedBank = JSON.parse(localStorage.getItem("selectedBank"))
 
   //état pour les menus
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLogoutMenuOpen, setIsLogoutMenuOpen] = useState(false);
-  const [isBankMenuOpen, setIsBankMenuOpen] = useState(false);
-  const [availableBanks, setAvailableBanks] = useState([]); // pour les banques dispo
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isLogoutMenuOpen, setIsLogoutMenuOpen] = useState(false)
+  const [isBankMenuOpen, setIsBankMenuOpen] = useState(false)
+  const [availableBanks, setAvailableBanks] = useState([]) // pour les banques dispo
 
   useEffect(() => {
     const fetchBanks = async () => {
       try {
-        const token = localStorage.getItem("token");
-        
-        const response = await fetch("/api/banks", {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-          },
-        });
-        
-        if (response.ok) {
-          const banks = await response.json();
-          setAvailableBanks(banks);
+        // ne faire l'appel que si on n'a pas déjà des banques et qu'on est sur le dashboard
+        if (availableBanks.length === 0 && location.pathname === '/dashboard') {
+          const response = await authService.secureRequest("/api/banks", {
+            method: 'GET'
+          });
+          
+          if (response && response.ok) {
+            const result = await response.json();
+            setAvailableBanks(result.banks || result);
+          }
         }
       } catch (error) {
         console.error("Erreur récupération banques:", error);
       }
     };
     
-    if (user) {
+    if (user && location.pathname === '/dashboard') {
       fetchBanks();
     }
-  }, [user]);
+  }, [user, location.pathname, availableBanks.length])
 
   // Fermer les menus quand on clique ailleurs
   useEffect(() => {
     const handleClickOutside = () => {
       setIsBankMenuOpen(false);
-      setIsLogoutMenuOpen(false);
+      setIsLogoutMenuOpen(false)
       setIsMobileMenuOpen(false);
     };
 
@@ -72,13 +74,9 @@ const Header = () => {
     // Recharger la page pour mettre à jour les données
     window.location.reload();
   };
-  // fonction de déconnexion
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    localStorage.removeItem("selectedBank");
-    localStorage.removeItem("selectedBankId");
-    navigate("/login");
+  // fonction de déconnexion sécurisée
+  const handleLogout = async () => {
+    await authService.logout();
   };
 
   //determiner le titre de la page
@@ -224,7 +222,7 @@ const Header = () => {
                           e.stopPropagation();
                           setIsBankMenuOpen(!isBankMenuOpen);
                         }}
-                        className="flex items-center space-x-2 bg-gray-50 hover:bg-gray-200 px-3 py-2 rounded-md cursor-pointer"
+                        className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md cursor-pointer"
                       >
                         <span className="text-gray-700 text-sm sm:text-base">
                           {selectedBank.name.replace("BNP Paribas -", "")}
@@ -266,7 +264,7 @@ const Header = () => {
 
                 {/* notification (seulement dashboard) */}
                 {location.pathname === "/dashboard" && (
-                  <button className="p-2 text-gray-400 hover:text-gray-600">
+                  <button className="p-2 text-gray-400 hover:text-gray-600 cursor-pointer">
                     <BellIcon className="h-5 w-5 sm:h-6 sm:w-6" />
                   </button>
                 )}

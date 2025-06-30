@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { validateEmail, validatePassword } from '../services/validation';
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { validateEmail, validatePassword } from '../services/validation'
+import authService from '../services/authService'
 
 const Login = () => {
   const navigate = useNavigate();
   
-  // État pour les données du formulaire
+  // état pour les données du formulaire
   const [role, setRole] = useState('CHG');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +16,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   // Validation des champs 
-  // Gestion des changements dans les champs
   const handleRoleChange = (e) => {
     setRole(e.target.value)
   };
@@ -40,7 +40,7 @@ const Login = () => {
     setPasswordError('')
     setLoading(true)
 
-    // Validation côté client
+    // validation côté client
     const emailValidation = validateEmail(email)
     const passwordValidation = validatePassword(password)
 
@@ -52,42 +52,28 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-          role: role
-        }),
-      })
+      const result = await authService.login({
+        email: email,
+        password: password,
+        role: role
+      });
 
-      const result = await response.json()
-
-      if (response.ok) {
-        localStorage.setItem('token', result.token);
-        localStorage.setItem('user', JSON.stringify(result.user));
-        // Si RES avec plusieurs agences, redirect vers selection de la banque
-        if (result.requiresBankSelection) {
-          navigate('/select-bank');
-        } else {
-          if (result.selectedBank) {
-            localStorage.setItem('selectedBankId', result.selectedBank.id);
-            localStorage.setItem('selectedBank', JSON.stringify(result.selectedBank));
-          }
-          // Redirection vers le dashboard
-          navigate('/dashboard');
-        }
+      // Si RES avec plusieurs agences, redirect vers selection de la banque
+      if (result.requiresBankSelection) {
+        navigate('/select-bank')
       } else {
-        setError(result.message || 'Erreur de connexion');
+        if (result.selectedBank) {
+          localStorage.setItem('selectedBankId', result.selectedBank.id)
+          localStorage.setItem('selectedBank', JSON.stringify(result.selectedBank))
+        }
+        // Redirection vers le dashboard
+        navigate('/dashboard')
       }
     } catch (error) {
-      console.error('Erreur connexion:', error);
-      setError('Erreur de connexion au serveur');
+      console.error('Erreur connexion:', error)
+      setError(error.message || 'Erreur de connexion au serveur')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   };
 
@@ -177,7 +163,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-[#1E40AF] to-[#10B981] text-white py-3 px-4 rounded-lg text-sm font-medium hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                className="w-full bg-gradient-to-r from-[#153290] to-[#10B981] text-white py-3 px-4 rounded-lg text-sm font-medium hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg cursor-pointer"
               >
                 {loading ? 'Connexion...' : 'Se connecter'}
               </button>

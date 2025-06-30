@@ -16,7 +16,7 @@ const Dashboard = () => {
         <Header />
         <main className="flex-1 p-2 sm:p-6 lg:p-4">
           {/* Grid 2x2 pour les 4 containers */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-1">
             {/* Container 1 - Top Left: Prêts à surveiller */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-[400px]">
               <LoanWatchlist />

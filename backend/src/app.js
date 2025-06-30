@@ -1,14 +1,21 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser'); // Pour les cookies httpOnly
 require('dotenv').config();
 
 const app = express();
 
+// Configuration pour récupérer la vraie IP (rate limiting)
+app.set('trust proxy', 1);
+
 // Middlewares globaux
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
+  credentials: true // Essentiel pour les cookies httpOnly
 }));
+
+// Middleware pour parser les cookies
+app.use(cookieParser());
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
