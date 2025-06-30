@@ -8,15 +8,15 @@ import Footer from "../components/Footer";
 
 const Dashboard = () => {
   return (
-    <div className="flex bg-gray-100">
+    <div className="flex">
       <Sidebar />
 
       {/* Contenu principal */}
       <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
         <Header />
-        <main className="flex-1 p-2 sm:p-6 lg:p-4">
+        <main className="flex-1 p-2 sm:p-3 lg:p-2">
           {/* Grid 2x2 pour les 4 containers */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-1">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-1">
             {/* Container 1 - Top Left: Prêts à surveiller */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-[400px]">
               <LoanWatchlist />

@@ -2,12 +2,20 @@ model Loan {
   id            Int          @id @default(autoincrement())
   userId        Int
   bankId        Int
+  companyId     Int
   amount        Float
-  status        String
+  status        String  @default("Actif")
   startDate     DateTime
-  endDate       DateTime
+  dueDate       DateTime
+  duration      Int
+  interestRate  Float
+  monthlyPayment Float
+  riskLevel    String 
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   user          User         @relation(fields: [userId], references: [id])
   bank          Bank         @relation(fields: [bankId], references: [id])
+  company       Company      @relation(fields: [companyId], references: [id])
   payments      Payment[]
   riskScores    RiskScore[]
   alerts        Alert[]

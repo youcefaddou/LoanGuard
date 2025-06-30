@@ -10,7 +10,7 @@ app.set('trust proxy', 1);
 
 // Middlewares globaux
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL,
   credentials: true // Essentiel pour les cookies httpOnly
 }));
 
@@ -43,6 +43,8 @@ app.get('/api/health', (req, res) => {
     version: '1.0.0'
   });
 });
+
+// app.use('/api', loanRoute)
 
 // Gestion des routes non trouvées
 app.use('*', (req, res) => {

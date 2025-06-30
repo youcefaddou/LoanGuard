@@ -111,7 +111,7 @@ const Sidebar = () => {
                 className={`${
                   isActive(item.route)
                     ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700 cursor-pointer"
-                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900 cursor-pointer"
+                    : "text-gray-700 hover:bg-gray-200 hover:text-gray-900 cursor-pointer"
                 } group flex items-center px-3 py-2 text-sm font-medium rounded-l-md w-full text-left`}
               >
                 <item.icon

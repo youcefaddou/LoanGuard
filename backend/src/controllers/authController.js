@@ -126,7 +126,7 @@ exports.login = async (req, res) => {
       { expiresIn: '8h' }
     );
 
-    // Cookie httpOnly sécurisé (Protection XSS - plus sûr que localStorage)
+    // Cookie httpOnly sécurisé (Protection XSS)
     res.cookie('authToken', token, {
       httpOnly: true,                          // Pas accessible via JavaScript
       secure: process.env.NODE_ENV === 'production', // HTTPS en production

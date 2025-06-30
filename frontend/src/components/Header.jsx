@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline"
 
 
-const Header = () => {
+const Header = ({ onAddLoan }) => {
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -256,7 +256,9 @@ const Header = () => {
               <div className="flex items-center space-x-2 sm:space-x-4">
                 {/* Bouton spécial selon page */}
                 {location.pathname === "/loans" && (
-                  <button className="bg-blue-800 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-blue-700 text-sm sm:text-base cursor-pointer">
+                  <button
+                    onClick={onAddLoan}
+                    className="bg-blue-800 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-blue-700 text-sm sm:text-base cursor-pointer">
                     <span className="hidden sm:inline">Ajouter un prêt</span>
                     <span className="sm:hidden sm:text-sm">Ajout Prêt</span>
                   </button>

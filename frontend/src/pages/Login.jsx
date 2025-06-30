@@ -163,7 +163,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-[#153290] to-[#10B981] text-white py-3 px-4 rounded-lg text-sm font-medium hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg cursor-pointer"
+                className="w-full bg-gradient-to-r from-[#153290] to-[#10B981] text-white py-3 px-4 rounded-lg text-sm font-medium hover:from-teal-600 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg cursor-pointer"
               >
                 {loading ? 'Connexion...' : 'Se connecter'}
               </button>
