@@ -27,8 +27,9 @@ const Header = ({ onAddLoan }) => {
   useEffect(() => {
     const fetchBanks = async () => {
       try {
-        // ne faire l'appel que si on n'a pas déjà des banques et qu'on est sur le dashboard
-        if (availableBanks.length === 0 && location.pathname === '/dashboard') {
+        // ne faire l'appel que si on n'a pas déjà des banques et qu'on est sur une page avec sélecteur
+        const pagesWithBankSelector = ['/dashboard', '/companies'];
+        if (availableBanks.length === 0 && pagesWithBankSelector.includes(location.pathname)) {
           const response = await authService.secureRequest("/api/banks", {
             method: 'GET'
           });
@@ -43,7 +44,8 @@ const Header = ({ onAddLoan }) => {
       }
     };
     
-    if (user && location.pathname === '/dashboard') {
+    const pagesWithBankSelector = ['/dashboard', '/companies'];
+    if (user && pagesWithBankSelector.includes(location.pathname)) {
       fetchBanks();
     }
   }, [user, location.pathname, availableBanks.length])
@@ -82,6 +84,7 @@ const Header = ({ onAddLoan }) => {
   //determiner le titre de la page
   const getPageTitle = () => {
     if (location.pathname === "/dashboard") return null;
+    if (location.pathname === "/companies") return null; 
     if (location.pathname === "/loans") return "Gestion des prêts";
     if (location.pathname === "/simulator") return "Simulation d'impact";
     if (location.pathname === "/settings") return "Gestion des Utilisateurs";
@@ -240,7 +243,7 @@ const Header = ({ onAddLoan }) => {
                                 e.stopPropagation();
                                 handleBankChange(bank);
                               }}
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 cursor-pointer"
                             >
                               {bank.name.replace("BNP Paribas -", "")}
                             </button>
