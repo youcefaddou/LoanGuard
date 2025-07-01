@@ -73,3 +73,51 @@ exports.getCompanies = async (req, res) => {
     res.status(500).json({ message: "Erreur récupération des entreprises" });
   }
 };
+
+exports.getAllLoans = async (req, res) => {
+  try {
+    const loans = await prisma.loan.findMany({
+      where: {
+        userId: req.user.id,
+      }, 
+      include: {
+        company: {
+          select: {
+            name: true
+          }
+        },
+        riskScores: {
+          orderBy: {  //récupère le dernier score de risque
+            date: 'desc'
+          },
+          take: 1, 
+          select: {
+            riskLevel: true
+          }
+        }
+      }
+    });
+
+    // Formatage des données pour l'interface
+    const formattedLoans = loans.map(loan => ({
+      id: loan.id,
+      companyName: loan.company.name,
+      amount: loan.amount,
+      dueDate: loan.dueDate,
+      riskLevel: loan.riskScores.length > 0 ? loan.riskScores[0].riskLevel : 'Non évalué',
+      status: loan.status,
+      interestRate: loan.interestRate,
+      monthlyPayment: loan.monthlyPayment,
+      startDate: loan.startDate,
+      duration: loan.duration
+    }));
+
+    res.json({
+      message: "Prêts récupérés avec succès",
+      loans: formattedLoans
+    });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des prêts:", error);
+    res.status(500).json({ message: "Erreur lors de la récupération des prêts" });
+  }
+};

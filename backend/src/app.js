@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser'); // Pour les cookies httpOnly
+
 require('dotenv').config();
 
 const app = express();
@@ -43,8 +44,11 @@ app.get('/api/health', (req, res) => {
     version: '1.0.0'
   });
 });
+const companyRoutes = require('./routes/companyRoute')
+app.use('/api/companies', companyRoutes)
 
-// app.use('/api', loanRoute)
+const loanRoute = require('./routes/loanRoute')
+app.use('/api/loans', loanRoute)
 
 // Gestion des routes non trouvées
 app.use('*', (req, res) => {

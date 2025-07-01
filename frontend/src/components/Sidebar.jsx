@@ -8,6 +8,7 @@ import {
   Cog6ToothIcon,
   XMarkIcon,
   Bars3Icon,
+  BuildingOfficeIcon
 } from "@heroicons/react/24/outline";
 
 const Sidebar = () => {
@@ -42,6 +43,13 @@ const Sidebar = () => {
       name: "Simulateur de prêt",
       icon: CalculatorIcon,
       route: "/simulator",
+      roles: ["CHG", "RES"],
+    },
+    {
+      id: "entreprises",
+      name: "Entreprises",
+      icon: BuildingOfficeIcon,
+      route: "/companies",
       roles: ["CHG", "RES"],
     },
     {

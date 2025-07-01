@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import SelectBank from './pages/SelectBank';
-import Loans from './pages/Loans'
+import Loans from './pages/Loans';
+import Companies from './pages/Companies';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/select-bank" element={<SelectBank />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/loans" element={<Loans />} />
+        <Route path="/companies" element={<Companies />} />
       </Routes>
     </Router>
   );
