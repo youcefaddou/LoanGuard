@@ -4,7 +4,8 @@ import Dashboard from './pages/Dashboard';
 import SelectBank from './pages/SelectBank';
 import Loans from './pages/Loans';
 import Companies from './pages/Companies';
-
+import LoanDetail
+ from './pages/LoanDetail';
 function App() {
   return (
     <Router>
@@ -14,6 +15,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/loans" element={<Loans />} />
         <Route path="/companies" element={<Companies />} />
+        <Route path="/loans/:id" element={<LoanDetail />} />
       </Routes>
     </Router>
   );

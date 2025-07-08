@@ -132,3 +132,26 @@ exports.getAllLoans = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la récupération des prêts" });
   }
 };
+
+exports.getLoanById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const loan = await prisma.loan.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        company: true,
+        bank: true,
+        payments: {
+          orderBy: {dueDate: 'desc'}
+        }
+        }
+      })
+    if (!loan) {
+      return res.status(404).json({ message: "Prêt non trouvé" });
+    }
+    res.json(loan)
+  } catch (error) {
+    console.error("Erreur lors de la récupération du prêt:", error);
+    res.status(500).json({ message: "Erreur lors de la récupération du prêt" });
+  }
+}

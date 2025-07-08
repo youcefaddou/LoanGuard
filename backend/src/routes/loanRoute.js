@@ -10,6 +10,6 @@ router.get("/", authMiddleware, loanController.getAllLoans)
 // router.put("/loans/:id", authMiddleware, loanController.updateLoan)
 // router.delete("/loans/:id", authMiddleware, loanController.deleteLoan)
 router.get("/companies", authMiddleware, loanController.getCompanies)
-
+router.get('/:id', authMiddleware, loanController.getLoanById);
 
 module.exports = router

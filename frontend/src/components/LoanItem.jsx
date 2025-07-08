@@ -21,7 +21,7 @@ const LoanItem = ({ loan }) => {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow cursor-pointer">
       <div className="flex items-center justify-between">
         <div className="flex items-center min-w-0 flex-1">
           {/* Nom de l'entreprise - responsive */}
