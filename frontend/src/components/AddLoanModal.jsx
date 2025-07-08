@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import authService from "../services/authService";
+import useAuth from "../hooks/useAuth";
 
 const AddLoanModal = ({ isOpen, onClose, onLoanAdded }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     companyId: "",
     amount: "",
@@ -10,11 +12,34 @@ const AddLoanModal = ({ isOpen, onClose, onLoanAdded }) => {
     startDate: "",
     status: "Actif",
   });
+  const updateFormData = (field, value) => {
+    setFormData({
+      companyId: field === 'companyId' ? value : formData.companyId,
+      amount: field === 'amount' ? value : formData.amount,
+      interestRate: field === 'interestRate' ? value : formData.interestRate,
+      duration: field === 'duration' ? value : formData.duration,
+      startDate: field === 'startDate' ? value : formData.startDate,
+      status: field === 'status' ? value : formData.status
+    });
+  };
 
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const isRes = user && user.role === 'RES'
+
+  // Fonction pour obtenir la description du secteur NAF
+  const getSectorDescription = (nafCode) => {
+  const sectorsMap = {
+    '01.11Z': 'Culture de céréales',
+    '01.21Z': 'Culture de la vigne', 
+    '41.20A': 'Construction maisons individuelles',
+    '56.10A': 'Restauration traditionnelle',
+    '47.11A': 'Commerce alimentaire'
+  };
+  return sectorsMap[nafCode] || nafCode;
+}
   //Récuperer les entreprises au chargement
   useEffect(() => {
     if (isOpen) {
@@ -22,9 +47,14 @@ const AddLoanModal = ({ isOpen, onClose, onLoanAdded }) => {
     }
   }, [isOpen]);
 
+  // Si l'utilisateur n'est pas responsable, ne pas afficher la modal
+  if (!isRes) {
+    return null;
+  }
+
   const fetchCompanies = async () => {
     try {
-      const response = await authService.secureRequest("/api/companies");
+      const response = await authService.secureRequest("/api/loans/companies");
       if (response.ok) {
         const data = await response.json();
         setCompanies(data);
@@ -93,21 +123,14 @@ const AddLoanModal = ({ isOpen, onClose, onLoanAdded }) => {
             </label>
             <select
               value={formData.companyId}
-              onChange={(e) => setFormData({
-                companyId: e.target.value,
-                amount: formData.amount,
-                interestRate: formData.interestRate,
-                duration: formData.duration,
-                startDate: formData.startDate,
-                status: formData.status
-              })}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => updateFormData('companyId', e.target.value)}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 "
               required
             >
               <option value="">Sélectionner une entreprise</option>
               {companies.map(company => (
                 <option key={company.id} value={company.id}>
-                  {company.name} - {company.sector}
+                  {company.name} - {getSectorDescription(company.sector)}
                 </option>
               ))}
             </select>
@@ -121,14 +144,7 @@ const AddLoanModal = ({ isOpen, onClose, onLoanAdded }) => {
               <input
                 type="number"
                 value={formData.amount}
-                onChange={(e) => setFormData({
-                  companyId: formData.companyId,
-                  amount: e.target.value,
-                  interestRate: formData.interestRate,
-                  duration: formData.duration,
-                  startDate: formData.startDate,
-                  status: formData.status
-                })}
+                onChange={(e) => updateFormData('amount', e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="2500000"
                 required
@@ -142,14 +158,7 @@ const AddLoanModal = ({ isOpen, onClose, onLoanAdded }) => {
                 type="number"
                 step="0.1"
                 value={formData.interestRate}
-                onChange={(e) => setFormData({
-                  companyId: formData.companyId,
-                  amount: formData.amount,
-                  interestRate: e.target.value,
-                  duration: formData.duration,
-                  startDate: formData.startDate,
-                  status: formData.status
-                })}
+                onChange={(e) => updateFormData('interestRate', e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="3.2"
                 required
@@ -165,14 +174,7 @@ const AddLoanModal = ({ isOpen, onClose, onLoanAdded }) => {
               <input
                 type="number"
                 value={formData.duration}
-                onChange={(e) => setFormData({
-                  companyId: formData.companyId,
-                  amount: formData.amount,
-                  interestRate: formData.interestRate,
-                  duration: e.target.value,
-                  startDate: formData.startDate,
-                  status: formData.status
-                })}
+                onChange={(e) => updateFormData('duration', e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="60"
                 required
@@ -185,14 +187,7 @@ const AddLoanModal = ({ isOpen, onClose, onLoanAdded }) => {
               <input
                 type="date"
                 value={formData.startDate}
-                onChange={(e) => setFormData({
-                  companyId: formData.companyId,
-                  amount: formData.amount,
-                  interestRate: formData.interestRate,
-                  duration: formData.duration,
-                  startDate: e.target.value,
-                  status: formData.status
-                })}
+                onChange={(e) => updateFormData('startDate', e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
@@ -205,14 +200,7 @@ const AddLoanModal = ({ isOpen, onClose, onLoanAdded }) => {
             </label>
             <select
               value={formData.status}
-              onChange={(e) => setFormData({
-                companyId: formData.companyId,
-                amount: formData.amount,
-                interestRate: formData.interestRate,
-                duration: formData.duration,
-                startDate: formData.startDate,
-                status: e.target.value
-              })}
+              onChange={(e) => updateFormData('status', e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="Actif">Actif</option>

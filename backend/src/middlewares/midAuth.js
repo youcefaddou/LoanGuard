@@ -21,12 +21,11 @@ const authMiddleware = function (req, res, next) {
         message: 'Token invalide - données manquantes' 
       });
     }
-    
     // Ajout des infos utilisateur à la requête
     req.user = {
       id: decoded.id,
       role: decoded.role,
-      email: decoded.email
+      email: decoded.email,
     };
     
     next();

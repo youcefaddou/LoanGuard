@@ -57,7 +57,7 @@ const Sidebar = () => {
       name: "Paramètres",
       icon: Cog6ToothIcon,
       route: "/settings",
-      roles: ["RES"],
+      roles: ["RES", "CHG"],
     },
   ];
 

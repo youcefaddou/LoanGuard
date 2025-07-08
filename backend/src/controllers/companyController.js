@@ -91,8 +91,23 @@ const getCompaniesByBank = async (req, res) => {
   }
 };
 
+const getCompaniesByUser = async (req, res) => {
+  try {
+    //recuperer le bankId de l'utilisateur connecté
+    const bankId = req.user.bankId;
+    const companies = await prisma.company.findMany({
+      where: { bankId: parseInt(bankId) },
+      orderBy: { createdAt: "desc" },
+    });
+    res.json(companies)
+  } catch (error) {
+    console.error("Erreur récupération entreprises: ", error.message);
+    res.status(500).json({ message: "Erreur lors de la récupération" });
+  }
+}
 module.exports = {
   searchCompanyBySiret,
   createCompany,
   getCompaniesByBank,
-};
+  getCompaniesByUser
+}

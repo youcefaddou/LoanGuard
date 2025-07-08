@@ -64,12 +64,19 @@ const authService = {
 
   // requête sécurisée avec cookies
   async secureRequest(url, options = {}) {
+    const selectedBankId = localStorage.getItem('selectedBankId')
+    
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    if (selectedBankId) {
+      headers['x-bank-id'] = selectedBankId;
+    }
+
     const response = await fetch(`${API_URL}${url}`, {
       method: options.method || 'GET',
       credentials: 'include', // inclure les cookies
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: headers,
       body: options.body 
     })
     // ne pas rediriger automatiquement, laisser le composant gérer l'erreur 401

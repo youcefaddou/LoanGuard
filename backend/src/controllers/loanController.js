@@ -56,10 +56,10 @@ exports.createLoan = async (req, res) => {
 
 exports.getCompanies = async (req, res) => {
   try {
+    const bankId = req.headers["x-bank-id"]
+
     const companies = await prisma.company.findMany({
-      where: {
-        bankId: req.user.bankId,
-      },
+      where: bankId ? { bankId: parseInt(bankId) } : {},
       select: {
         id: true,
         name: true,
