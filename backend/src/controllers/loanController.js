@@ -15,9 +15,18 @@ exports.createLoan = async (req, res) => {
     if (!companyId || !amount || !interestRate || !duration || !startDate) {
       return res.status(400).json({ message: "Tous les champs sont requis" });
     }
-    //calcul date d'échéance
-    const dueDate = new Date(startDate);
-    dueDate.setMonth(dueDate.getMonth() + duration);
+    //calcul date d'échéance - date du dernier paiement mensuel
+    const startDateObj = new Date(startDate);
+    const dueDate = new Date(startDateObj);
+    
+    // Ajouter (duration - 1) mois car le dernier paiement se fait au mois (duration - 1)
+    // Par exemple: prêt de 12 mois = paiements aux mois 0, 1, 2, ..., 11
+    const monthsToAdd = duration - 1;
+    const years = Math.floor(monthsToAdd / 12);
+    const months = monthsToAdd % 12;
+    
+    dueDate.setFullYear(startDateObj.getFullYear() + years);
+    dueDate.setMonth(startDateObj.getMonth() + months);
     //calcul mensualité
     const monthlyRate = interestRate / 100 / 12;
     const monthlyPayment =
@@ -75,9 +84,12 @@ exports.getCompanies = async (req, res) => {
 
 exports.getAllLoans = async (req, res) => {
   try {
+    const bankId = req.headers["x-bank-id"];
+    
     const loans = await prisma.loan.findMany({
       where: {
         userId: req.user.id,
+        bankId: bankId ? parseInt(bankId) : undefined, 
       }, 
       include: {
         company: {
