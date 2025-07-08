@@ -27,7 +27,7 @@ exports.createLoan = async (req, res) => {
     const newLoan = await prisma.loan.create({
       data: {
         userId: req.user.id,
-        bankId: req.user.bankId,
+        bankId: parseInt(req.headers["x-bank-id"]),
         companyId: parseInt(companyId),
         amount: parseFloat(amount),
         interestRate: parseFloat(interestRate),
@@ -36,7 +36,6 @@ exports.createLoan = async (req, res) => {
         dueDate,
         status,
         monthlyPayment: Math.round(monthlyPayment * 100) / 100,
-        riskLevel: null,
       },
       include: {
         company: true,
