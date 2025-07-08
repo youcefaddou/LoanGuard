@@ -61,7 +61,7 @@ const LoanItem = ({ loan }) => {
         </div>
       </div>
 
-      {/* Informations supplémentaires visibles seulement sur mobile */}
+      {/* Infos supplémentaires visibles seulement sur mobile */}
       <div className="md:hidden mt-2 pt-2 border-t border-gray-100">
         <div className="flex justify-between items-center text-xs text-gray-600">
           <span>Échéance: {formatDate(loan.dueDate)}</span>
