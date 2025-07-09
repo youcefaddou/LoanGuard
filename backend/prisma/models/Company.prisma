@@ -10,6 +10,5 @@ model Company {
   updatedAt DateTime @updatedAt
   bankId    Int
   bank      Bank     @relation(fields: [bankId], references: [id])
-  users     User[]
   loans     Loan[]
 }

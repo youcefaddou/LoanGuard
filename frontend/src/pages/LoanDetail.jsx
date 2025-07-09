@@ -13,7 +13,6 @@ const LoanDetail = () => {
   const navigate = useNavigate();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [loan, setLoan] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const handleBack = () => {
@@ -36,16 +35,14 @@ const LoanDetail = () => {
   useEffect(() => {
     const fetchLoan = async () => {
       try {
-        setLoading(true);
-        const token = localStorage.getItem("token"); 
+        const selectedBankId = localStorage.getItem("selectedBankId");
 
         const response = await fetch(`http://localhost:4000/api/loans/${id}`, {
           method: "GET",
-          credentials: "include", 
+          credentials: "include", // Envoie automatiquement le cookie authToken
           headers: {
             "Content-Type": "application/json",
-            "x-bank-id": "1",
-            "Authorization": token ? `Bearer ${token}` : "",
+            "x-bank-id": selectedBankId || "1",
           },
         });
 
@@ -63,8 +60,6 @@ const LoanDetail = () => {
       } catch (error) {
         console.error("Erreur fetch prêt:", error);
         setError("Erreur de connexion");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -72,19 +67,6 @@ const LoanDetail = () => {
       fetchLoan();
     }
   }, [id, navigate]);
-
-  // Fonction utilitaire pour formater les montants
-  const formatAmount = (amount) => {
-    if (!amount) return "€0";
-
-    if (amount >= 1000000) {
-      return `€${(amount / 1000000).toFixed(1)}M`;
-    } else if (amount >= 1000) {
-      return `€${(amount / 1000).toFixed(0)}K`;
-    } else {
-      return `€${amount.toLocaleString()}`;
-    }
-  };
 
   return (
     <div className="flex">
@@ -106,8 +88,17 @@ const LoanDetail = () => {
         />
 
         <main className="flex-1 p-2 sm:p-3 lg:p-2">
-          {/* Layout principal - 2 colonnes 60/40 sur desktop/tablet */}
-          <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-2 mb-4">
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+              <div className="flex items-center">
+                <div className="text-red-600 mr-2">Erreur</div>
+                <p className="text-red-800">{error}</p>
+              </div>
+            </div>
+          )}
+
+          {!error && loan && (
+            <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-2 mb-4">
             {/* Colonne 1 - Gauche */}
             <div className="space-y-4">
               {/* Ligne 1: CompanyInfo + LoanInfo côte à côte */}
@@ -275,7 +266,8 @@ const LoanDetail = () => {
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+          )}
         </main>
         <Footer />
       </div>

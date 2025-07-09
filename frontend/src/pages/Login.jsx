@@ -58,16 +58,18 @@ const Login = () => {
         role: role
       });
 
-      // Si RES avec plusieurs agences, redirect vers selection de la banque
+      // Si RES/CHG avec plusieurs agences, stocker les banques et rediriger vers sélection
       if (result.requiresBankSelection) {
-        navigate('/select-bank')
+        localStorage.setItem('banksToSelect', JSON.stringify(result.banks));
+        navigate('/select-bank');
       } else {
+        // Connexion directe (une seule banque ou ADM)
         if (result.selectedBank) {
-          localStorage.setItem('selectedBankId', result.selectedBank.id)
-          localStorage.setItem('selectedBank', JSON.stringify(result.selectedBank))
+          localStorage.setItem('selectedBankId', result.selectedBank.id);
+          localStorage.setItem('selectedBank', JSON.stringify(result.selectedBank));
         }
         // Redirection vers le dashboard
-        navigate('/dashboard')
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Erreur connexion:', error)

@@ -1,8 +1,14 @@
-import React from 'react';
+import { useNavigate } from "react-router-dom";
+import { formatDate } from "../utils/formatters";
 
 const LoanItem = ({ loan }) => {
-  //formatage du montant en euros (compact pour responsive)
-  const formatAmount = (amount) => {
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate(`/loans/${loan.id}`);
+  };
+
+  // Formatage du montant adapté pour LoanItem (format spécifique)
+  const formatAmountForItem = (amount) => {
     if (amount >= 1000000) {
       return `${(amount / 1000000).toFixed(1)}M €`;
     } else if (amount >= 1000) {
@@ -11,30 +17,24 @@ const LoanItem = ({ loan }) => {
     return `${amount} €`;
   };
 
-  //formatage de la date
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
-
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow cursor-pointer">
+    <div
+      className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-pointer"
+      onClick={handleClick}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center min-w-0 flex-1">
           {/* Nom de l'entreprise - responsive */}
           <div className="min-w-0 flex-1 md:w-60 md:flex-none">
             <h3 className="font-semibold text-gray-900 truncate">
-              {loan.companyName || 'Entreprise inconnue'}
+              {loan.companyName || "Entreprise inconnue"}
             </h3>
           </div>
 
           {/* Montant - responsive avec espace réduit */}
           <div className="ml-2 md:ml-4 md:w-32 text-right flex-shrink-0">
             <span className="font-semibold text-gray-900 text-sm md:text-base">
-              {formatAmount(loan.amount)}
+              {formatAmountForItem(loan.amount)}
             </span>
           </div>
 
@@ -47,9 +47,7 @@ const LoanItem = ({ loan }) => {
 
           {/* Taux d'intérêt - masqué sur mobile, visible sur md+ */}
           <div className="hidden md:block md:w-16 text-center ml-4">
-            <span className="text-sm text-gray-600">
-              {loan.interestRate}%
-            </span>
+            <span className="text-sm text-gray-600">{loan.interestRate}%</span>
           </div>
         </div>
 

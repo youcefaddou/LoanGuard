@@ -63,7 +63,7 @@ const Loans = () => {
               {loans.length === 0 ? (
                 <p className="text-gray-500 text-center py-8">Aucun prêt enregistré pour le moment</p>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-1">
                   {loans.map(loan => (
                     <LoanItem key={loan.id} loan={loan} />
                   ))}

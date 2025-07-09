@@ -95,25 +95,9 @@ exports.login = async (req, res) => {
       recordAttempt(sanitizedEmail, false);
       return res.status(401).json({ message: 'Identifiants incorrects'});
     }
-    
-    //Verification que le compte n'est pas désactivé
-    if (user.isActive === false) {
-      return res.status(403).json({ message: 'Compte désactivé. Contactez l\'administrateur'});
-    }
 
     // Succès - Reset rate limiting
     recordAttempt(sanitizedEmail, true);
-
-    // recupération des agences associées à l'utilisateur (si RES)
-    let userBanks = [];
-    if (user.role === 'RES') {
-      userBanks = await prisma.userBank.findMany({
-        where: { userId: user.id },
-        include: { 
-          bank: true
-        }
-      });
-    }
 
     // Génération token JWT sécurisé (8h au lieu de 24h pour sécurité)
     const token = jwt.sign(
@@ -134,34 +118,27 @@ exports.login = async (req, res) => {
       maxAge: 8 * 60 * 60 * 1000              // 8 heures
     });
 
-    // Logique de redirection selon le nombre d'agences
-    if (user.role === 'RES' && userBanks.length > 1) {
-      // Conversion des agences pour la réponse
-      const banksForResponse = [];
-      for (let i = 0; i < userBanks.length; i++) {
-        banksForResponse.push({
-          id: userBanks[i].bank.id,
-          name: userBanks[i].bank.name,
-          address: userBanks[i].bank.address,
-          city: userBanks[i].bank.city
+    // Logique de redirection selon le rôle
+    if (user.role === 'CHG') {
+      // CHG : doit avoir exactement une banque
+      const userBanks = await prisma.userBank.findMany({
+        where: { userId: user.id },
+        include: { bank: true }
+      });
+
+      if (userBanks.length === 0) {
+        return res.status(403).json({ 
+          message: 'Aucune agence assignée à ce chargé de risques. Contactez l\'administrateur'
         });
       }
-      
-      // RES avec plusieurs agences -> sélection obligatoire
-      res.json({
-        message: 'Connexion réussie',
-        user: {
-          id: user.id,
-          lastName: user.lastName,
-          firstName: user.firstName,
-          email: user.email,
-          role: user.role
-        },
-        requiresBankSelection: true,
-        banks: banksForResponse
-      });
-    } else if (user.role === 'RES' && userBanks.length === 1) {
-      // RES avec une seule agence -> accès direct
+
+      if (userBanks.length > 1) {
+        return res.status(403).json({ 
+          message: 'Erreur configuration : un chargé de risques ne peut être assigné qu\'à une seule agence'
+        });
+      }
+
+      // CHG avec une banque -> accès direct
       res.json({
         message: 'Connexion réussie',
         user: {
@@ -179,8 +156,64 @@ exports.login = async (req, res) => {
           city: userBanks[0].bank.city
         }
       });
+
+    } else if (user.role === 'RES') {
+      // RES : peut avoir une ou plusieurs banques
+      const userBanks = await prisma.userBank.findMany({
+        where: { userId: user.id },
+        include: { bank: true }
+      });
+
+      if (userBanks.length === 0) {
+        return res.status(403).json({ 
+          message: 'Aucune agence assignée à ce responsable. Contactez l\'administrateur'
+        });
+      }
+
+      if (userBanks.length === 1) {
+        // RES avec une seule banque -> accès direct
+        res.json({
+          message: 'Connexion réussie',
+          user: {
+            id: user.id,
+            lastName: user.lastName,
+            firstName: user.firstName,
+            email: user.email,
+            role: user.role
+          },
+          requiresBankSelection: false,
+          selectedBank: {
+            id: userBanks[0].bank.id,
+            name: userBanks[0].bank.name,
+            address: userBanks[0].bank.address,
+            city: userBanks[0].bank.city
+          }
+        });
+      } else {
+        // RES avec plusieurs banques -> sélection obligatoire
+        const banksForResponse = userBanks.map(ub => ({
+          id: ub.bank.id,
+          name: ub.bank.name,
+          address: ub.bank.address,
+          city: ub.bank.city
+        }));
+
+        res.json({
+          message: 'Connexion réussie',
+          user: {
+            id: user.id,
+            lastName: user.lastName,
+            firstName: user.firstName,
+            email: user.email,
+            role: user.role
+          },
+          requiresBankSelection: true,
+          banks: banksForResponse
+        });
+      }
+
     } else {
-      // CHG ou RES sans agence -> accès direct dashboard
+      // ADM ou autres rôles -> accès direct dashboard
       res.json({
         message: 'Connexion réussie',
         user: {
@@ -197,6 +230,59 @@ exports.login = async (req, res) => {
   } catch (error) {
     console.error('Erreur connexion:', error);
     res.status(500).json({ message: 'Erreur serveur lors de la connexion'});
+  }
+};
+
+// Sélection de banque après connexion (pour RES avec plusieurs agences)
+exports.selectBank = async (req, res) => {
+  const { bankId } = req.body;
+  const userId = req.user.id; // Vient du middleware d'authentification
+  const userRole = req.user.role; // Vient du middleware d'authentification
+  
+  try {
+    // Validation des données d'entrée
+    if (!bankId) {
+      return res.status(400).json({ message: 'ID de banque obligatoire' });
+    }
+
+    // Vérification que seul un RES peut sélectionner une banque
+    if (userRole !== 'RES') {
+      return res.status(403).json({ 
+        message: 'Seul un responsable peut sélectionner une agence' 
+      });
+    }
+
+    // Vérification que l'utilisateur a bien accès à cette banque
+    const userBank = await prisma.userBank.findFirst({
+      where: { 
+        userId: userId,
+        bankId: parseInt(bankId)
+      },
+      include: { 
+        bank: true
+      }
+    });
+
+    if (!userBank) {
+      return res.status(403).json({ 
+        message: 'Accès non autorisé à cette agence'
+      });
+    }
+
+    // Retour des informations de la banque sélectionnée
+    res.json({
+      message: 'Banque sélectionnée avec succès',
+      selectedBank: {
+        id: userBank.bank.id,
+        name: userBank.bank.name,
+        address: userBank.bank.address,
+        city: userBank.bank.city
+      }
+    });
+    
+  } catch (error) {
+    console.error('Erreur sélection banque:', error);
+    res.status(500).json({ message: 'Erreur serveur lors de la sélection de banque' });
   }
 };
 

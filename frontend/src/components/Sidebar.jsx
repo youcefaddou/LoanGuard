@@ -146,7 +146,7 @@ const Sidebar = () => {
             <div className="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
 
             {/* Sidebar panel */}
-            <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
+            <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white border-r border-gray-200">
               {/* Logo mobile */}
               <div className="flex items-center h-16 flex-shrink-0 px-4 border-b border-gray-200">
                 <div className="flex items-center">

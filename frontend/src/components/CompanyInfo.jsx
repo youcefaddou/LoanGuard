@@ -1,3 +1,5 @@
+import { formatSiret } from "../utils/formatters";
+
 const CompanyInfo = ({ company }) => {
   // Fonction pour obtenir la description du secteur NAF
   const getSectorDescription = (nafCode) => {
@@ -23,20 +25,6 @@ const CompanyInfo = ({ company }) => {
     if (company.region) parts.push(company.region);
     
     return parts.length > 0 ? parts.join(", ") : "Non spécifiée";
-  };
-
-  // Fonction pour formater le SIRET/SIREN
-  const formatSiret = (siret) => {
-    if (!siret) return "Non spécifié";
-    
-    // Formatage avec espaces pour la lisibilité (XXX XXX XXX XXXXX)
-    const cleaned = siret.toString().replace(/\s/g, '');
-    if (cleaned.length === 14) {
-      return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{5})/, '$1 $2 $3 $4');
-    } else if (cleaned.length === 9) {
-      return cleaned.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
-    }
-    return cleaned;
   };
 
   return (

@@ -9,67 +9,41 @@ const SelectBank = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // vérifier que l'utilisateur est connecté
+    // Vérifier que l'utilisateur est connecté
     if (!authService.isAuthenticated()) {
       navigate('/login');
       return;
     }
 
-    // variable pour éviter les appels multiples
-    let isMounted = true;
-
-    // récupérer les agences du RES connecté
-    const fetchUserBanks = async () => {
-      try {
-        const response = await authService.secureRequest('/api/banks/user-banks', {
-          method: 'GET'
-        });
-
-        if (!isMounted) return; // composant démonté, arrêter
-
-        if (response.ok) {
-          const result = await response.json();
-          setBanks(result.banks);
-        } else if (response.status === 401) {
-          // session expirée, rediriger vers login
-          authService.logout();
-          return;
-        } else {
-          const result = await response.json();
-          setError(result.message || 'Erreur lors de la récupération des agences');
-        }
-      } catch (error) {
-        if (!isMounted) return; // composant démonté, arrêter
-        
-        console.error('Erreur fetchUserBanks:', error);
-        setError('Erreur de connexion au serveur');
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchUserBanks();
-
-    // cleanup function pour éviter les fuites mémoire
-    return () => {
-      isMounted = false;
-    };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // selection d'une agence
-  const handleBankSelection = (bank) => {
-    // empêcher les clics multiples
-    setLoading(true);
-    
-    localStorage.setItem('selectedBankId', bank.id);
-    localStorage.setItem('selectedBank', JSON.stringify(bank));
-    
-    // petite pause avant navigation pour éviter les conflits
-    setTimeout(() => {
+    // Récupérer les banques depuis les données de connexion
+    const banksFromStorage = localStorage.getItem('banksToSelect');
+    if (banksFromStorage) {
+      setBanks(JSON.parse(banksFromStorage));
+      setLoading(false);
+    } else {
+      // Si pas de banques en attente de sélection, rediriger vers dashboard
       navigate('/dashboard');
-    }, 100);
+    }
+  }, [navigate]);
+
+  // Sélection d'une agence
+  const handleBankSelection = async (bank) => {
+    try {
+      setLoading(true);
+      
+      // Appeler l'API pour sélectionner la banque
+      await authService.selectBank(bank.id);
+      
+      // Nettoyer les données temporaires
+      localStorage.removeItem('banksToSelect');
+      
+      // Rediriger vers le dashboard
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Erreur sélection banque:', error);
+      setError(error.message || 'Erreur lors de la sélection de la banque');
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -125,7 +99,8 @@ const SelectBank = () => {
                 <button
                   key={bank.id}
                   onClick={() => handleBankSelection(bank)}
-                  className="w-full p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-left group cursor-pointer"
+                  disabled={loading}
+                  className="w-full p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-left group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <div className="flex justify-between items-center">
                     <div>
@@ -136,7 +111,7 @@ const SelectBank = () => {
                         {bank.address}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {bank.zipCode} {bank.city}
+                        {bank.city}
                       </p>
                     </div>
                     <div className="text-blue-500 group-hover:text-blue-700">

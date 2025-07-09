@@ -21,12 +21,49 @@ const authService = {
         if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
         }
+        
+        // Stocker la banque sélectionnée si elle est fournie (connexion directe)
+        if (data.selectedBank) {
+          localStorage.setItem('selectedBank', JSON.stringify(data.selectedBank));
+          localStorage.setItem('selectedBankId', data.selectedBank.id);
+        }
+        
         return data; // Retourner directement les données du backend
       } else {
         throw new Error(data.message || 'Erreur de connexion');
       }
     } catch (error) {
       console.error('Erreur service login:', error);
+      throw error;
+    }
+  },
+
+  // Sélection de banque après connexion
+  async selectBank(bankId) {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/select-bank`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ bankId }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Stocker la banque sélectionnée
+        if (data.selectedBank) {
+          localStorage.setItem('selectedBank', JSON.stringify(data.selectedBank));
+          localStorage.setItem('selectedBankId', data.selectedBank.id);
+        }
+        return data;
+      } else {
+        throw new Error(data.message || 'Erreur lors de la sélection de banque');
+      }
+    } catch (error) {
+      console.error('Erreur service sélection banque:', error);
       throw error;
     }
   },

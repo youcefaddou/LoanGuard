@@ -220,35 +220,51 @@ const Header = ({ onAddLoan }) => {
                 ) : (
                   selectedBank && (
                     <div className="relative">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsBankMenuOpen(!isBankMenuOpen);
-                        }}
-                        className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md cursor-pointer"
-                      >
-                        <span className="text-gray-700 text-sm sm:text-base">
-                          {selectedBank.name.replace("BNP Paribas -", "")}
-                        </span>
-                        <ChevronDownIcon className="h-4 w-4 text-gray-500" />
-                      </button>
-
-                      {/* Menu déroulant des agences */}
-                      {isBankMenuOpen && (
-                        <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-48">
-                          {availableBanks.map((bank) => (
-                            <button
-                              key={bank.id}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleBankChange(bank);
-                              }}
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 cursor-pointer"
-                            >
-                              {bank.name.replace("BNP Paribas -", "")}
-                            </button>
-                          ))}
+                      {/* Affichage conditionnel selon le rôle */}
+                      {user?.role === 'CHG' ? (
+                        // CHG : affichage simple de l'agence (non cliquable)
+                        <div className="flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-md">
+                          <span className="text-gray-700 text-sm sm:text-base">
+                            {selectedBank.name.replace("BNP Paribas -", "")}
+                          </span>
+                          <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
                         </div>
+                      ) : (
+                        // RES : sélecteur d'agence normal
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsBankMenuOpen(!isBankMenuOpen);
+                            }}
+                            className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md cursor-pointer"
+                          >
+                            <span className="text-gray-700 text-sm sm:text-base">
+                              {selectedBank.name.replace("BNP Paribas -", "")}
+                            </span>
+                            <ChevronDownIcon className="h-4 w-4 text-gray-500" />
+                          </button>
+
+                          {/* Menu déroulant des agences */}
+                          {isBankMenuOpen && (
+                            <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-48">
+                              {availableBanks.map((bank) => (
+                                <button
+                                  key={bank.id}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleBankChange(bank);
+                                  }}
+                                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 cursor-pointer"
+                                >
+                                  {bank.name.replace("BNP Paribas -", "")}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   )

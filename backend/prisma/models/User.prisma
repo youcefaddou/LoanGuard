@@ -5,8 +5,6 @@ model User {
   firstName    String      @db.VarChar(100)
   lastName     String      @db.VarChar(100)
   role         String      @db.VarChar(50)
-  companyId    Int?
-  company      Company?    @relation(fields: [companyId], references: [id])
   activityLogs ActivityLog[]
   userBanks    UserBank[]
   loans        Loan[]

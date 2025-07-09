@@ -8,6 +8,9 @@ const authMiddleware = require('../middlewares/midAuth');
 // Connexion utilisateur
 router.post('/login', authController.login);
 
+// Sélection de banque après connexion (nécessite authentification)
+router.post('/select-bank', authMiddleware, authController.selectBank);
+
 // Déconnexion sécurisée (nécessite authentification)
 router.post('/logout', authMiddleware, authController.logout);
 

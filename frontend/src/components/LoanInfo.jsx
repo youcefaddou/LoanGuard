@@ -1,28 +1,7 @@
 import React from "react";
+import { formatAmount, formatDate } from "../utils/formatters";
 
 const LoanInfo = ({ loan }) => {
-  const formatAmount = (amount) => {
-    if (!amount) return "0€";
-
-    if (amount >= 1000000) {
-      return `€${(amount / 1000000).toFixed(1)}M`;
-    } else if (amount >= 1000) {
-      return `€${(amount / 1000).toFixed(0)}K`;
-    } else {
-      return `€${amount.toLocaleString()}`;
-    }
-  };
-
-  // Fonction pour formater les dates
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
-
   // Fonction pour formater le montant exact (sans centimes)
   const formatExactAmount = (amount) => {
     if (!amount) return "€0";
