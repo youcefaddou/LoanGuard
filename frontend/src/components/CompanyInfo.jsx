@@ -36,13 +36,13 @@ const CompanyInfo = ({ company }) => {
         <div className="flex justify-between">
           <span className="text-gray-600">Nom</span>
           <span className="font-medium">
-            {company?.name || "Non spécifié"}
+            {company && company.name ? company.name : "Non spécifié"}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Secteur</span>
           <span className="font-medium">
-            {company?.sector ? getSectorDescription(company.sector) : "Non spécifié"}
+            {company && company.sector ? getSectorDescription(company.sector) : "Non spécifié"}
           </span>
         </div>
         <div className="flex justify-between">
@@ -54,11 +54,11 @@ const CompanyInfo = ({ company }) => {
         <div className="flex justify-between">
           <span className="text-gray-600">SIRET</span>
           <span className="font-medium font-mono text-xs">
-            {formatSiret(company?.siret)}
+            {formatSiret(company && company.siret ? company.siret : null)}
           </span>
         </div>
         {/* Informations supplémentaires si disponibles */}
-        {company?.activityCode && (
+        {company && company.activityCode && (
           <div className="flex justify-between">
             <span className="text-gray-600">Code NAF</span>
             <span className="font-medium font-mono text-xs">
@@ -66,7 +66,7 @@ const CompanyInfo = ({ company }) => {
             </span>
           </div>
         )}
-        {company?.legalForm && (
+        {company && company.legalForm && (
           <div className="flex justify-between">
             <span className="text-gray-600">Forme juridique</span>
             <span className="font-medium">

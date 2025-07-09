@@ -1,4 +1,3 @@
-import React from "react";
 import { formatAmount, formatDate } from "../utils/formatters";
 
 const LoanInfo = ({ loan }) => {
@@ -58,12 +57,12 @@ const LoanInfo = ({ loan }) => {
         <div className="flex justify-between">
           <span className="text-gray-600">Montant</span>
           <span className="font-semibold text-lg">
-            {formatAmount(loan?.amount)}
+            {formatAmount(loan && loan.amount ? loan.amount : 0)}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Statut</span>
-          {getStatusBadge(loan?.status)}
+          {getStatusBadge(loan && loan.status ? loan.status : 'ACTIVE')}
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Prochaine échéance</span>
@@ -71,11 +70,11 @@ const LoanInfo = ({ loan }) => {
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Mensualité</span>
-          <span className="font-medium">{formatExactAmount(loan?.monthlyPayment)}</span>
+          <span className="font-medium">{formatExactAmount(loan && loan.monthlyPayment ? loan.monthlyPayment : 0)}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Taux</span>
-          <span className="font-medium">{loan?.interestRate}% annuel</span>
+          <span className="font-medium">{loan && loan.interestRate ? loan.interestRate : 0}% annuel</span>
         </div>
       </div>
     </div>

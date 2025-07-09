@@ -43,7 +43,7 @@ const searchCompaniesBySector = async (sectorCode, maxResults = 10) => {
     }));
 
   } catch (error) {
-    console.error(`Erreur recherche secteur ${sectorCode}:`, error.response?.data || error.message);
+    console.error(`Erreur recherche secteur ${sectorCode}:`, error.response && error.response.data ? error.response.data : error.message);
     return [];
   }
 };

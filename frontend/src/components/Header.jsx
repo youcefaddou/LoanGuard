@@ -221,7 +221,7 @@ const Header = ({ onAddLoan }) => {
                   selectedBank && (
                     <div className="relative">
                       {/* Affichage conditionnel selon le rôle */}
-                      {user?.role === 'CHG' ? (
+                      {user && user.role === 'CHG' ? (
                         // CHG : affichage simple de l'agence (non cliquable)
                         <div className="flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-md">
                           <span className="text-gray-700 text-sm sm:text-base">
@@ -276,8 +276,15 @@ const Header = ({ onAddLoan }) => {
                 {/* Bouton spécial selon page */}
                 {location.pathname === "/loans" && (
                   <button
-                    onClick={onAddLoan}
-                    className="bg-blue-800 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-blue-700 text-sm sm:text-base cursor-pointer">
+                    onClick={user && user.role === 'CHG' ? undefined : onAddLoan}
+                    disabled={user && user.role === 'CHG'}
+                    className={`px-3 sm:px-4 py-2 rounded-md text-sm sm:text-base transition-colors ${
+                      user && user.role === 'CHG' 
+                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                        : 'bg-blue-800 text-white hover:bg-blue-700 cursor-pointer'
+                    }`}
+                    title={user && user.role === 'CHG' ? 'Seul un responsable peut ajouter un prêt' : 'Ajouter un nouveau prêt'}
+                  >
                     <span className="hidden sm:inline">Ajouter un prêt</span>
                     <span className="sm:hidden sm:text-sm">Ajout Prêt</span>
                   </button>

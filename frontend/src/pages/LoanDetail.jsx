@@ -82,9 +82,9 @@ const LoanDetail = () => {
           onExport={handleExport}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          companyName={loan?.company?.name}
-          companySiren={loan?.company?.siret}
-          companyActivitySector={loan?.company?.sector}
+          companyName={loan && loan.company && loan.company.name ? loan.company.name : null}
+          companySiren={loan && loan.company && loan.company.siret ? loan.company.siret : null}
+          companyActivitySector={loan && loan.company && loan.company.sector ? loan.company.sector : null}
         />
 
         <main className="flex-1 p-2 sm:p-3 lg:p-2">
@@ -104,7 +104,7 @@ const LoanDetail = () => {
               {/* Ligne 1: CompanyInfo + LoanInfo côte à côte */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* CompanyInfo - Composant dynamique */}
-                <CompanyInfo company={loan?.company} />
+                <CompanyInfo company={loan && loan.company ? loan.company : null} />
 
                 {/* LoanInfo */}
                 <LoanInfo loan={loan} />
