@@ -1,5 +1,3 @@
-import React from 'react';
-
 const PaymentTimeline = ({ payments }) => {
     const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -15,10 +13,10 @@ const PaymentTimeline = ({ payments }) => {
   };
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <h3 className="font-semibold text-gray-900 mb-3">Timeline des paiements</h3>
+        <h3 className="font-semibold text-gray-900 mb-3">Historique des paiements</h3>
         <div className="space-y-3">
           {payments && payments.length > 0 ? (
-            payments.map((payment, index) => {
+            payments.map((payment) => {
               const isLate = payment.status === "LATE"
               
               return (
