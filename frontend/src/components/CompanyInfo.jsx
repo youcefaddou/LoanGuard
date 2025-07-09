@@ -40,7 +40,7 @@ const CompanyInfo = ({ company }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 h-full">
       <h3 className="font-semibold text-gray-900 mb-3">
         Informations entreprise
       </h3>

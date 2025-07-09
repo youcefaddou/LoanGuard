@@ -1,5 +1,7 @@
-const { PrismaClient } = require("../../generated/prisma");
-const prisma = new PrismaClient();
+const { PrismaClient } = require("../../generated/prisma")
+const prisma = new PrismaClient()
+const { generatePaymentHistory } = require("../utils/generatePayments")
+
 
 exports.createLoan = async (req, res) => {
   try {
@@ -52,6 +54,9 @@ exports.createLoan = async (req, res) => {
         bank: true,
       },
     });
+    //générer automatiquement l'historique des paiements
+    await generatePaymentHistory(newLoan);
+    
     res.status(201).json({
       message: "Prêt créé avec succès",
       loan: newLoan,

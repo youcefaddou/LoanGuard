@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import LoanDetailHeader from "../components/LoanDetailHeader";
 import LoanInfo from "../components/LoanInfo";
 import CompanyInfo from "../components/CompanyInfo";
+import PaymentTimeline from "../components/PaymentTimeline";
 
 const LoanDetail = () => {
   const { id } = useParams();
@@ -36,15 +37,15 @@ const LoanDetail = () => {
     const fetchLoan = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token"); // ✅ Récupérer du localStorage
+        const token = localStorage.getItem("token"); 
 
         const response = await fetch(`http://localhost:4000/api/loans/${id}`, {
           method: "GET",
-          credentials: "include", // ✅ Envoyer les cookies httpOnly
+          credentials: "include", 
           headers: {
             "Content-Type": "application/json",
             "x-bank-id": "1",
-            ...(token && { Authorization: `Bearer ${token}` }), // ✅ Envoyer le token SI il existe
+            "Authorization": token ? `Bearer ${token}` : "",
           },
         });
 
@@ -106,7 +107,7 @@ const LoanDetail = () => {
 
         <main className="flex-1 p-2 sm:p-3 lg:p-2">
           {/* Layout principal - 2 colonnes 60/40 sur desktop/tablet */}
-          <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4 mb-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-2 mb-4">
             {/* Colonne 1 - Gauche */}
             <div className="space-y-4">
               {/* Ligne 1: CompanyInfo + LoanInfo côte à côte */}
@@ -146,61 +147,7 @@ const LoanDetail = () => {
               </div>
 
               {/* Ligne 3: PaymentTimeline */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">
-                  Timeline des paiements
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">
-                          Paiement effectué
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          15/11/2024
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        €125,000 • À temps
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">
-                          Paiement en retard
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          15/10/2024
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        €125,000 • 3 jours de retard
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">
-                          Paiement effectué
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          15/09/2024
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        €125,000 • À temps
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <PaymentTimeline payments={loan && loan.payments ? loan.payments : []} />
             </div>
 
             {/* Colonne 2 - Droite */}
