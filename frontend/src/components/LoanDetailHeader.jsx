@@ -6,8 +6,6 @@ const LoanDetailHeader = ({
   onEdit, 
   onDelete,
   companyName = "Entreprise ABC",
-  companySiren = "123 456 789",
-  companyActivitySector = "Technologies"
 }) => {
   return (
     <div className="bg-white border-b border-gray-200 px-4 py-4">
@@ -26,9 +24,6 @@ const LoanDetailHeader = ({
             <h1 className="text-sm md:text-xl font-semibold text-gray-900">
               Détail du prêt - {companyName}
             </h1>
-            <p className="text-xs md:text-sm text-gray-600">
-              SIREN: {companySiren} • Secteur: {companyActivitySector}
-            </p>
           </div>
         </div>
         

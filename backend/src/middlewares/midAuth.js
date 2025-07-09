@@ -6,6 +6,14 @@ const authMiddleware = function (req, res, next) {
     // recupération du token depuis les cookies
     const token = req.cookies.authToken;
     
+    // Si pas de token dans les cookies, regarder dans les headers
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7); // Enlever "Bearer "
+      }
+    }
+    
     if (!token) {
       return res.status(401).json({ 
         message: "Token d'authentification manquant"

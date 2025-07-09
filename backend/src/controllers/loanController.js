@@ -18,13 +18,13 @@ exports.createLoan = async (req, res) => {
     //calcul date d'échéance - date du dernier paiement mensuel
     const startDateObj = new Date(startDate);
     const dueDate = new Date(startDateObj);
-    
+
     // Ajouter (duration - 1) mois car le dernier paiement se fait au mois (duration - 1)
     // Par exemple: prêt de 12 mois = paiements aux mois 0, 1, 2, ..., 11
     const monthsToAdd = duration - 1;
     const years = Math.floor(monthsToAdd / 12);
     const months = monthsToAdd % 12;
-    
+
     dueDate.setFullYear(startDateObj.getFullYear() + years);
     dueDate.setMonth(startDateObj.getMonth() + months);
     //calcul mensualité
@@ -64,7 +64,7 @@ exports.createLoan = async (req, res) => {
 
 exports.getCompanies = async (req, res) => {
   try {
-    const bankId = req.headers["x-bank-id"]
+    const bankId = req.headers["x-bank-id"];
 
     const companies = await prisma.company.findMany({
       where: bankId ? { bankId: parseInt(bankId) } : {},
@@ -85,51 +85,57 @@ exports.getCompanies = async (req, res) => {
 exports.getAllLoans = async (req, res) => {
   try {
     const bankId = req.headers["x-bank-id"];
-    
+
     const loans = await prisma.loan.findMany({
       where: {
         userId: req.user.id,
-        bankId: bankId ? parseInt(bankId) : undefined, 
-      }, 
+        bankId: bankId ? parseInt(bankId) : undefined,
+      },
       include: {
         company: {
           select: {
-            name: true
-          }
+            name: true,
+          },
         },
         riskScores: {
-          orderBy: {  //récupère le dernier score de risque
-            date: 'desc'
+          orderBy: {
+            //récupère le dernier score de risque
+            date: "desc",
           },
-          take: 1, 
+          take: 1,
           select: {
-            riskLevel: true
-          }
-        }
-      }
+            riskLevel: true,
+          },
+        },
+      },
     });
 
     // Formatage des données pour l'interface
-    const formattedLoans = loans.map(loan => ({
+    const formattedLoans = loans.map((loan) => ({
       id: loan.id,
       companyName: loan.company.name,
       amount: loan.amount,
       dueDate: loan.dueDate,
-      riskLevel: loan.riskScores.length > 0 ? loan.riskScores[0].riskLevel : 'Non évalué',
+      riskLevel:
+        loan.riskScores.length > 0
+          ? loan.riskScores[0].riskLevel
+          : "Non évalué",
       status: loan.status,
       interestRate: loan.interestRate,
       monthlyPayment: loan.monthlyPayment,
       startDate: loan.startDate,
-      duration: loan.duration
+      duration: loan.duration,
     }));
 
     res.json({
       message: "Prêts récupérés avec succès",
-      loans: formattedLoans
+      loans: formattedLoans,
     });
   } catch (error) {
     console.error("Erreur lors de la récupération des prêts:", error);
-    res.status(500).json({ message: "Erreur lors de la récupération des prêts" });
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la récupération des prêts" });
   }
 };
 
@@ -142,16 +148,16 @@ exports.getLoanById = async (req, res) => {
         company: true,
         bank: true,
         payments: {
-          orderBy: {dueDate: 'desc'}
-        }
-        }
-      })
+          orderBy: { date: "desc" },
+        },
+      },
+    });
     if (!loan) {
       return res.status(404).json({ message: "Prêt non trouvé" });
     }
-    res.json(loan)
+    res.json(loan);
   } catch (error) {
     console.error("Erreur lors de la récupération du prêt:", error);
     res.status(500).json({ message: "Erreur lors de la récupération du prêt" });
   }
-}
+};
