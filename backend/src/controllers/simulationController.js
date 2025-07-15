@@ -24,6 +24,15 @@ exports.runSimulation = async (req, res) => {
     if (!loan) {
       return res.status(404).json({ message: "Prêt non trouvé" });
     }
+    //Récupérer le score de risque de référence (premier score ou score par défaut)
+    const baseRiskScore = await prisma.riskScore.findFirst({
+      where: { loanId: loan.id },
+      orderBy: { date: "asc" }, // Premier score créé
+    });
+
+    // Utiliser le premier score comme référence, ou 5.0 par défaut
+    const baseScore = baseRiskScore ? baseRiskScore.score : 5.0;
+
     //calculer l'impact de l'event
     const impact = calculateEventImpact(
       eventType,
@@ -42,8 +51,8 @@ exports.runSimulation = async (req, res) => {
     });
 
     // Créer un RiskScore avec le résultat de la simulation
-    const scoreAfter = 5.0 + impact;
-    const newRiskLevel = impact > 2 ? "Élevé" : impact > 1 ? "Moyen" : "Faible";
+    const scoreAfter = Math.min(10, Math.max(0, baseScore + impact));
+    const newRiskLevel = scoreAfter >= 8 ? "Élevé" : scoreAfter >= 6 ? "Moyen" : "Faible";
     
     await prisma.riskScore.create({
       data: {
@@ -61,7 +70,7 @@ exports.runSimulation = async (req, res) => {
       message: "Simulation réussie",
       simulation,
       impact: {
-        before: 5.0,
+        before: baseScore,
         after: scoreAfter,
         change: impact,
         newRiskLevel,
@@ -100,28 +109,61 @@ function calculateEventImpact(eventType, parameters, sector) {
 
   switch (eventType) {
     case "weather":
-      if (
-        parameters.type === "canicule" &&
-        (sector.includes("Culture") || sector.includes("Construction"))
-      ) {
-        impact = parameters.intensity * 1.5;
+      if (parameters.type === "canicule") {
+        if (sector.includes("Culture") || sector.includes("Construction")) {
+          impact = parameters.intensity * 1.5;
+        } else {
+          impact = parameters.intensity * 0.8;
+        }
       } else if (parameters.type === "inondation") {
         impact = parameters.intensity * 1.2;
+      } else if (parameters.type === "gel") {
+        if (sector.includes("Commerce alimentaire") || sector.includes("Culture")) {
+          // Le gel affecte particulièrement l'alimentaire et l'agriculture
+          impact = parameters.intensity * 1.8;
+        } else {
+          impact = parameters.intensity * 0.6;
+        }
+      }
+      
+      // Permettre des impacts négatifs pour conditions favorables (intensité très faible)
+      if (parameters.intensity < 0.5) {
+        impact = -0.5; // Conditions favorables réduisent le risque
       }
       break;
 
     case "economic":
       if (parameters.type === "recession_sectorielle") {
         impact = parameters.severity * 2.0;
+      } else if (parameters.type === "hausse_taux") {
+        impact = parameters.severity * 1.5;
+      }
+      
+      // Permettre des impacts négatifs pour conditions économiques favorables
+      if (parameters.severity < 0.7) {
+        impact = -0.3; // Conditions économiques favorables
       }
       break;
 
     case "regulatory":
-      impact = parameters.impact * 0.8;
+      if (parameters.type === "nouvelle_reglementation") {
+        impact = parameters.severity * 1.5; 
+      } else if (parameters.type === "changement_fiscal") {
+        impact = parameters.severity * 2.0; 
+      } else if (parameters.type === "reforme_bancaire") {
+        impact = parameters.severity * 2.5; 
+      }
+      
+      // Permettre des impacts négatifs pour réglementations favorables
+      if (parameters.severity < 0.7) {
+        impact = -0.2; // Réglementation favorable
+      }
       break;
 
     default:
       impact = 0.5;
   }
-  return Math.min(impact, 3) // Limiter l'impact à 3 points
+  
+  // Permettre des impacts négatifs mais limiter la plage
+  return Math.max(-2, Math.min(impact, 3));
 }

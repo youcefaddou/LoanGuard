@@ -40,18 +40,16 @@ const RiskScore = ({ loanId, refreshTrigger }) => {
 
   // Fonction pour déterminer la couleur selon le score
   const getRiskColor = (score) => {
-    if (score >= 8) return 'red';
-    if (score >= 6) return 'orange';
-    if (score >= 4) return 'yellow';
-    return 'green';
+    if (score >= 8) return 'red';     // Élevé = Rouge
+    if (score >= 6) return 'orange';  // Moyen = Orange
+    return 'green';                   // Faible = Vert
   };
 
   // Fonction pour déterminer le libellé du risque
   const getRiskLabel = (score) => {
     if (score >= 8) return 'Risque Élevé';
     if (score >= 6) return 'Risque Moyen';
-    if (score >= 4) return 'Risque Faible';
-    return 'Risque Très Faible';
+    return 'Risque Faible';
   };
 
   // Fonction pour déterminer les classes CSS selon la couleur
@@ -67,18 +65,13 @@ const RiskScore = ({ loanId, refreshTrigger }) => {
         bg: 'bg-orange-100',
         badge: 'text-orange-800'
       },
-      yellow: {
-        text: 'text-yellow-600',
-        bg: 'bg-yellow-100',
-        badge: 'text-yellow-800'
-      },
       green: {
         text: 'text-green-600',
         bg: 'bg-green-100',
         badge: 'text-green-800'
       }
     };
-    return colorMap[color] || colorMap.orange;
+    return colorMap[color] || colorMap.green;
   };
 
   if (loading) {

@@ -7,6 +7,20 @@ const LoanItem = ({ loan }) => {
     navigate(`/loans/${loan.id}`);
   };
 
+  // Fonction pour obtenir le style du badge de risque
+  const getRiskBadgeStyle = (riskLevel) => {
+    switch (riskLevel) {
+      case "Faible":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "Moyen":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "Élevé":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
   return (
     <div
       className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-pointer"
@@ -41,10 +55,10 @@ const LoanItem = ({ loan }) => {
           </div>
         </div>
 
-        {/* Badge de risque temporaire - toujours visible */}
+        {/* Badge de risque - affiche le niveau de risque quand disponible */}
         <div className="flex-shrink-0 ml-2">
-          <span className="px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium bg-gray-100 text-gray-800 border border-gray-200">
-            -
+          <span className={`px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium border ${getRiskBadgeStyle(loan.riskLevel)}`}>
+            {loan.riskLevel || "-"}
           </span>
         </div>
       </div>
