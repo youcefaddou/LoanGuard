@@ -22,14 +22,12 @@ const Simulator = () => {
   return (
     <div className="flex">
       <Sidebar />
-      
       <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
         <Header />
-        
         <main className="flex-1 p-6 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             <h1 className="text-2xl font-bold text-gray-900 mb-6">
-              Simuler l'impact d'un événement
+              IA Prédictive - Simuler l'impact d'un événement externe
             </h1>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -75,7 +73,6 @@ const Simulator = () => {
             </div>
           </div>
         </main>
-        
         <Footer />
       </div>
     </div>
