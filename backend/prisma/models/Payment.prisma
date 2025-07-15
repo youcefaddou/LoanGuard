@@ -3,5 +3,6 @@ model Payment {
   loanId    Int
   amount    Float
   date      DateTime
+  status    String   @default("ON_TIME") // ON_TIME, LATE, PARTIAL
   loan      Loan     @relation(fields: [loanId], references: [id])
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
 
 const SelectBank = () => {
   const navigate = useNavigate();
@@ -8,47 +9,41 @@ const SelectBank = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Récupérer les agences du RES connecté
-    const fetchUserBanks = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        
-        if (!token) {
-          navigate('/login');
-          return;
-        }
+    // Vérifier que l'utilisateur est connecté
+    if (!authService.isAuthenticated()) {
+      navigate('/login');
+      return;
+    }
 
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/banks/user-banks`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          setBanks(result.banks);
-        } else {
-          const result = await response.json();
-          setError(result.message || 'Erreur lors de la récupération des agences');
-        }
-      } catch (error) {
-        console.error('Erreur fetchUserBanks:', error);
-        setError('Erreur de connexion au serveur');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserBanks();
+    // Récupérer les banques depuis les données de connexion
+    const banksFromStorage = localStorage.getItem('banksToSelect');
+    if (banksFromStorage) {
+      setBanks(JSON.parse(banksFromStorage));
+      setLoading(false);
+    } else {
+      // Si pas de banques en attente de sélection, rediriger vers dashboard
+      navigate('/dashboard');
+    }
   }, [navigate]);
 
-  // selection d'une agence
-  const handleBankSelection = (bank) => {
-    localStorage.setItem('selectedBankId', bank.id);
-    localStorage.setItem('selectedBank', JSON.stringify(bank));
-    navigate('/dashboard');
+  // Sélection d'une agence
+  const handleBankSelection = async (bank) => {
+    try {
+      setLoading(true);
+      
+      // Appeler l'API pour sélectionner la banque
+      await authService.selectBank(bank.id);
+      
+      // Nettoyer les données temporaires
+      localStorage.removeItem('banksToSelect');
+      
+      // Rediriger vers le dashboard
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Erreur sélection banque:', error);
+      setError(error.message || 'Erreur lors de la sélection de la banque');
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -104,7 +99,8 @@ const SelectBank = () => {
                 <button
                   key={bank.id}
                   onClick={() => handleBankSelection(bank)}
-                  className="w-full p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-left group"
+                  disabled={loading}
+                  className="w-full p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-left group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <div className="flex justify-between items-center">
                     <div>
@@ -115,7 +111,7 @@ const SelectBank = () => {
                         {bank.address}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {bank.zipCode} {bank.city}
+                        {bank.city}
                       </p>
                     </div>
                     <div className="text-blue-500 group-hover:text-blue-700">
@@ -133,7 +129,7 @@ const SelectBank = () => {
           <div className="mt-6 text-center">
             <button
               onClick={() => navigate('/login')}
-              className="text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
+              className="text-sm font-medium text-gray-600 hover:text-blue-700 transition-colors cursor-pointer"
             >
               ← Retour à la connexion
             </button>

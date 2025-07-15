@@ -1,5 +1,5 @@
 // Script pour créer des données de test avec agences multiples
-const { PrismaClient } = require('./generated/prisma');
+const { PrismaClient } = require('../generated/prisma');
 const argon2 = require('argon2');
 
 const prisma = new PrismaClient();
@@ -35,7 +35,16 @@ async function createTestBanks() {
         city: 'Allauch'
       }
     });
-    console.log('Agences BNP créées:', bank1.name, bank2.name, bank3.name);
+
+    const bank4 = await prisma.bank.create({
+      data: {
+        name: 'BNP Paribas - Aubagne',
+        address: '1 Avenue Jeanne D\'arc',
+        zipCode: '13400',
+        city: 'Aubagne'
+      }
+    });
+    console.log('Agences BNP créées:', bank1.name, bank2.name, bank3.name, bank4.name);
 
     // 2. Créer un RES avec plusieurs agences
     const hashedPassword = await argon2.hash('Testpass123!');
@@ -75,7 +84,7 @@ async function createTestBanks() {
     await prisma.userBank.create({
       data: {
         userId: resSingleUser.id,
-        bankId: bank1.id
+        bankId: bank4.id
       }
     });
     console.log('RES avec une seule agence créé');

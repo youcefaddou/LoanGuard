@@ -1,8 +1,9 @@
 model Simulation {
-  id        Int      @id @default(autoincrement())
-  loanId    Int
-  params    String   // JSON ou autre structure selon besoin
-  result    String
-  date      DateTime
-  loan      Loan     @relation(fields: [loanId], references: [id])
+  id         Int      @id @default(autoincrement())
+  loanId     Int
+  eventType  String // "weather", "economic", "sector"
+  parameters String // JSON des paramètres
+  impact     Float // Impact sur le score
+  createdAt  DateTime @default(now())
+  loan       Loan     @relation(fields: [loanId], references: [id])
 }
