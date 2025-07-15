@@ -214,7 +214,7 @@ const Header = ({ onAddLoan }) => {
               {/* Titre de page OU Sélecteur d'agence */}
               <div className="flex items-center">
                 {getPageTitle() ? (
-                  <h1 className="text-lg sm:text-xl font-semibold text-gray-900">
+                  <h1 className="text-lg sm:text-xl font-bold text-gray-900">
                     {getPageTitle()}
                   </h1>
                 ) : (
