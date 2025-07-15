@@ -52,6 +52,8 @@ app.use('/api/loans', loanRoute)
 
 app.use('/api/risk', require('./routes/riskRoute'))
 
+app.use('/api/simulation', require('./routes/simulationRoute'))
+
 // Gestion des routes non trouvées
 app.use('*', (req, res) => {
   res.status(404).json({ 
