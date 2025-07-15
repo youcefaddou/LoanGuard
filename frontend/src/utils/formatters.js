@@ -1,5 +1,3 @@
-// Fonctions utilitaires de formatage pour LoanGuard
-
 // Formatage des montants
 export const formatAmount = (amount) => {
   if (!amount) return "0€";
