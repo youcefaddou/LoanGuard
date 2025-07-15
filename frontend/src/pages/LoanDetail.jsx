@@ -10,6 +10,8 @@ import CompanyInfo from "../components/CompanyInfo";
 import PaymentTimeline from "../components/PaymentTimeline";
 import EditLoanModal from "../components/EditLoanModal";
 import DeleteConfirmModal from "../components/DeleteConfirmModal";
+import EventSimulator from "../components/EventSimulator";
+import RiskScore from "../components/RiskScore";
 
 const LoanDetail = () => {
   const { id } = useParams();
@@ -18,6 +20,11 @@ const LoanDetail = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [loan, setLoan] = useState(null);
   const [error, setError] = useState(null);
+  const [refreshRiskScore, setRefreshRiskScore] = useState(0);
+
+  const handleSimulationComplete = () => {
+    setRefreshRiskScore(prev => prev + 1);
+  };
 
   const handleBack = () => {
     navigate("/loans");
@@ -148,31 +155,7 @@ const LoanDetail = () => {
                 </div>
 
                 {/* Ligne 2: RiskScore */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                  <h3 className="font-semibold text-gray-900 mb-3">
-                    Score de risque
-                  </h3>
-                  <div className="flex items-center justify-center">
-                    <div className="relative w-32 h-32">
-                      <div className="w-full h-full rounded-full border-8 border-gray-200 flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-orange-600">
-                            6.8
-                          </div>
-                          <div className="text-xs text-gray-500">/10</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-center mt-3">
-                    <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
-                      Risque Moyen
-                    </span>
-                    <div className="text-sm text-green-600 mt-1">
-                      Évolution: -0.3 pts
-                    </div>
-                  </div>
-                </div>
+                <RiskScore loanId={id} refreshTrigger={refreshRiskScore} />
 
                 {/* Ligne 3: PaymentTimeline */}
                 <PaymentTimeline
@@ -183,44 +166,7 @@ const LoanDetail = () => {
               {/* Colonne 2 - Droite */}
               <div className="space-y-4">
                 {/* EventSimulator */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                  <h3 className="font-semibold text-gray-900 mb-3">
-                    Configuration de la simulation
-                  </h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Scénario d'événement
-                      </label>
-                      <select className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
-                        <option>Retard de paiement URSSAF</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Paramètres de l'événement
-                      </label>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">
-                            Montant du retard (€)
-                          </span>
-                          <span className="font-medium">50,000</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">
-                            Durée (jours)
-                          </span>
-                          <span className="font-medium">30</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button className="w-full bg-gradient-to-r from-[#153290] to-[#10B981] text-white py-2 px-4 rounded-md font-medium hover:from-green-600 hover:to-blue-700 transition-colors cursor-pointer">
-                      Lancer la simulation
-                    </button>
-                  </div>
-                </div>
-
+                <EventSimulator loanId={id} onSimulationComplete={handleSimulationComplete} />
                 {/* AlertHistory */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                   <h3 className="font-semibold text-gray-900 mb-3">
@@ -325,6 +271,7 @@ const LoanDetail = () => {
               ? loan.company.name
               : "cette entreprise"
           }
+          amount={loan && loan.amount ? loan.amount : 0}
         />
         <Footer />
       </div>

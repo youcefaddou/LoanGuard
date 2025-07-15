@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const authMiddleware = function (req, res, next) {
   try {
     // recupération du token depuis les cookies
-    const token = req.cookies.authToken;
+    let token = req.cookies.authToken;
     
     // Si pas de token dans les cookies, regarder dans les headers
     if (!token) {

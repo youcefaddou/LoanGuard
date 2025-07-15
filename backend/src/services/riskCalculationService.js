@@ -58,7 +58,7 @@ const riskCalculationService = {
         include: { payments: true, company: true, user: true },
       });
       for (const loan of loans) {
-        await this.calculateRiskScore(loan.id);
+        await riskCalculationService.calculateRiskScore(loan.id);
       }
       return { success: true, updated: loans.length };
     } catch (error) {
@@ -76,17 +76,26 @@ const riskCalculationService = {
           message: "ID de prêt manquant",
         });
       }
-      const result = await this.calculateRiskScore(loanId);
 
-      if (!result.success) {
+      // Vérifier s'il existe déjà un score de risque pour ce prêt
+      const existingRiskScore = await prisma.riskScore.findFirst({
+        where: { loanId: parseInt(loanId) },
+        orderBy: { date: 'desc' }
+      });
+
+      if (!existingRiskScore) {
         return res.status(404).json({
-          message: result.error,
+          message: "Aucune simulation n'a été lancée pour ce prêt",
         });
       }
+
+      // Retourner le score existant
       res.json({
-        message: "Score de risque calculé avec succès",
-        riskScore: result.data,
-        prediction: result.prediction,
+        message: "Score de risque récupéré avec succès",
+        score: existingRiskScore.score,
+        evolution: 0, // Pour le moment, on met 0 en attendant d'implémenter le calcul d'évolution
+        riskLevel: existingRiskScore.riskLevel,
+        date: existingRiskScore.date
       });
     } catch (error) {
       console.error("Erreur calcul risque API: ", error);

@@ -40,22 +40,29 @@ exports.runSimulation = async (req, res) => {
         impact,
       },
     });
-    //calculer le nouveau score avec impact
-    const currentResult = await riskCalculationService.calculateRiskScore(
-      loanId
-    );
-    const newScore = Math.min(currentResult.data.score + impact, 10);
 
-    let newRiskLevel = "Faible";
-    if (newScore > 7) newRiskLevel = "Élevé";
-    else if (newScore > 4) newRiskLevel = "Moyen";
+    // Créer un RiskScore avec le résultat de la simulation
+    const scoreAfter = 5.0 + impact;
+    const newRiskLevel = impact > 2 ? "Élevé" : impact > 1 ? "Moyen" : "Faible";
+    
+    await prisma.riskScore.create({
+      data: {
+        loanId: loan.id,
+        score: scoreAfter,
+        riskLevel: newRiskLevel,
+        date: new Date(),
+        weatherFactor: 0.5,
+        sectorFactor: 0.3,
+        externalFactors: JSON.stringify({ simulationImpact: impact }),
+      },
+    });
 
     res.json({
       message: "Simulation réussie",
       simulation,
       impact: {
-        before: currentResult.data.score,
-        after: newScore,
+        before: 5.0,
+        after: scoreAfter,
         change: impact,
         newRiskLevel,
       },
