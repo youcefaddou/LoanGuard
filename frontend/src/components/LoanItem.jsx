@@ -1,20 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { formatDate } from "../utils/formatters";
+import { formatAmountCompact, formatDate } from "../utils/formatters";
 
 const LoanItem = ({ loan }) => {
   const navigate = useNavigate();
   const handleClick = () => {
     navigate(`/loans/${loan.id}`);
-  };
-
-  // Formatage du montant adapté pour LoanItem (format spécifique)
-  const formatAmountForItem = (amount) => {
-    if (amount >= 1000000) {
-      return `${(amount / 1000000).toFixed(1)}M €`;
-    } else if (amount >= 1000) {
-      return `${(amount / 1000).toFixed(0)}K €`;
-    }
-    return `${amount} €`;
   };
 
   return (
@@ -34,7 +24,7 @@ const LoanItem = ({ loan }) => {
           {/* Montant - responsive avec espace réduit */}
           <div className="ml-2 md:ml-4 md:w-32 text-right flex-shrink-0">
             <span className="font-semibold text-gray-900 text-sm md:text-base">
-              {formatAmountForItem(loan.amount)}
+              {formatAmountCompact(loan.amount)}
             </span>
           </div>
 

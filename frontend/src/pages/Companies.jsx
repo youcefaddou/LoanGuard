@@ -4,6 +4,7 @@ import { BuildingOfficeIcon, MapPinIcon, UserIcon } from '@heroicons/react/24/ou
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import Sidebar from '../components/Sidebar';
+import { getSectorDescription } from '../utils/formatters';
 
 const Companies = () => {
   const [companies, setCompanies] = useState([]);
@@ -11,19 +12,6 @@ const Companies = () => {
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('');
   const [selectedSector, setSelectedSector] = useState('');
-
-  // Fonction pour obtenir la description du secteur NAF
-  const getSectorDescription = (nafCode) => {
-    const sectorsMap = {
-      '01.11Z': 'Culture de céréales',
-      '01.21Z': 'Culture de la vigne',
-      '41.20A': 'Construction maisons individuelles',
-      '56.10A': 'Restauration traditionnelle',
-      '47.11A': 'Commerce alimentaire'
-    };
-    
-    return sectorsMap[nafCode] || nafCode;
-  };
 
   // Récupérer les entreprises au chargement
   useEffect(() => {

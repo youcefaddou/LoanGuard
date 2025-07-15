@@ -95,6 +95,11 @@ exports.login = async (req, res) => {
       recordAttempt(sanitizedEmail, false);
       return res.status(401).json({ message: 'Identifiants incorrects'});
     }
+    
+    //Verification que le compte n'est pas désactivé
+    if (user.isActive === false) {
+      return res.status(403).json({ message: 'Compte désactivé. Contactez l\'administrateur'});
+    }
 
     // Succès - Reset rate limiting
     recordAttempt(sanitizedEmail, true);

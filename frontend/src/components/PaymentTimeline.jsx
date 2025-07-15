@@ -1,11 +1,6 @@
-import { formatDate } from "../utils/formatters";
+import { formatDate, formatExactAmount } from "../utils/formatters";
 
 const PaymentTimeline = ({ payments }) => {
-  const formatExactAmount = (amount) => {
-    if (!amount) return "€0";
-    return `€${Math.round(amount).toLocaleString()}`;
-  };
-  
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
         <h3 className="font-semibold text-gray-900 mb-3">Historique des paiements</h3>

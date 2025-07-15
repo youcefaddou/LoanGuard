@@ -30,7 +30,7 @@ const getCompanyBySiret = async (siret) => {
   } catch (error) {
     console.error('Erreur API Sirene:', error.message);
     
-    if (error.response && error.response.status === 404) {
+    if (error.response?.status === 404) {
       throw new Error('Entreprise non trouvée avec ce SIRET');
     }
     
@@ -68,7 +68,7 @@ const searchCompaniesByName = async (name) => {
     }))
 
   } catch (error) {
-    console.error('Erreur recherche entreprises:', error.response && error.response.data ? error.response.data : error.message);
+    console.error('Erreur recherche entreprises:', error.response?.data || error.message);
     throw new Error("Erreur lors de la recherche d'entreprises")
   }
 }

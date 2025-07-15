@@ -37,13 +37,13 @@ const LoanDetailHeader = ({
             </button>
             <button 
               onClick={onEdit}
-              className="px-3 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer"
+              className="px-3 py-2 bg-blue-800 text-white rounded-md text-sm font-medium hover:bg-blue-600 transition-colors cursor-pointer"
             >
               Modifier
             </button>
             <button 
               onClick={onDelete}
-              className="px-3 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 transition-colors cursor-pointer"
+              className="px-3 py-2 bg-red-700 text-white rounded-md text-sm font-medium hover:bg-red-600 transition-colors cursor-pointer"
             >
               Supprimer
             </button>

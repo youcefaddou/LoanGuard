@@ -166,3 +166,56 @@ exports.getLoanById = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la récupération du prêt" });
   }
 };
+
+exports.updateLoan = async (req, res) => {
+  const { id } = req.params;
+  const { amount, interestRate, duration, startDate, status } = req.body;
+  try {
+    //verifier que le prêt existe
+    const existingLoan = await prisma.loan.findUnique({
+      where: { id: parseInt(id) },
+    });
+    if (!existingLoan) {
+      return res.status(404).json({ message: "Prêt non trouvé" });
+    }
+    const updateLoan = await prisma.loan.update({
+      where: { id: parseInt(id) },
+      data: {
+        amount: parseFloat(amount),
+        interestRate: parseFloat(interestRate),
+        duration: parseInt(duration),
+        startDate: new Date(startDate),
+        status,
+      },
+      include: {
+        company: true,
+        payments: true
+      } 
+    })
+    res.json({message: "Prêt mis à jour avec succès", loan: updateLoan })
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du prêt:", error);
+    res.status(500).json({ message: "Erreur lors de la mise à jour du prêt" });
+  }
+}
+exports.deleteLoan = async (req, res) => {
+  const { id } = req.params
+  try {
+    const existingLoan = await prisma.loan.findUnique({
+      where: { id: parseInt(id) },
+    })
+    if (!existingLoan) {
+      return res.status(404).json({ message: "Prêt non trouvé" });
+    }
+    await prisma.payment.deleteMany({
+      where: { loanId: parseInt(id) },
+    })
+    await prisma.loan.delete({
+      where: { id: parseInt(id) },
+    })
+    res.json({ message: "Prêt supprimé avec succès" })
+  } catch (error) {
+    console.error("Erreur lors de la suppression du prêt:", error);
+    res.status(500).json({ message: "Erreur lors de la suppression du prêt" });
+  }
+}

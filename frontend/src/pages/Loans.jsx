@@ -42,14 +42,13 @@ const Loans = () => {
   }, []);
 
   //fonction pour gérer l'ajout d'un pret
-  const handleLoanAdded = (newLoan) => {
+  const handleLoanAdded = () => {
     fetchLoans(); // Recharger la liste complète
   };
 
   return (
     <div className="flex">
       <Sidebar />
-
       {/* Contenu principal */}
       <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
         <Header onAddLoan={() => setIsModalOpen(true)} />

@@ -1,4 +1,4 @@
-const sireneService = require('./src/services/sireneService');
+const sireneService = require('../src/services/sireneService');
 const { PrismaClient } = require('@prisma/client');
 const axios = require('axios');
 
@@ -43,7 +43,7 @@ const searchCompaniesBySector = async (sectorCode, maxResults = 20) => {
     }));
 
   } catch (error) {
-    console.error(`Erreur recherche secteur ${sectorCode}:`, error.response && error.response.data ? error.response.data : error.message);
+    console.error(`Erreur recherche secteur ${sectorCode}:`, error.response?.data || error.message);
     return [];
   }
 };

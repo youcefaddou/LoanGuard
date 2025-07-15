@@ -1,11 +1,7 @@
-import { formatAmount, formatDate } from "../utils/formatters";
+
+import { formatAmount, formatDate, formatExactAmount } from "../utils/formatters";
 
 const LoanInfo = ({ loan }) => {
-  // Fonction pour formater le montant exact (sans centimes)
-  const formatExactAmount = (amount) => {
-    if (!amount) return "€0";
-    return `€${Math.round(amount).toLocaleString()}`;
-  };
 
   // fonction pour calculer la prochaine échéance
   const getNextPaymentDate = (loan) => {
@@ -24,7 +20,6 @@ const LoanInfo = ({ loan }) => {
     if (nextPaymentDate > endDate) {
       return "Terminé";
     }
-    
     return formatDate(nextPaymentDate);
   };
   const getStatusBadge = (status) => {
@@ -57,12 +52,12 @@ const LoanInfo = ({ loan }) => {
         <div className="flex justify-between">
           <span className="text-gray-600">Montant</span>
           <span className="font-semibold text-lg">
-            {formatAmount(loan && loan.amount ? loan.amount : 0)}
+            {formatAmount(loan?.amount)}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Statut</span>
-          {getStatusBadge(loan && loan.status ? loan.status : 'ACTIVE')}
+          {getStatusBadge(loan?.status)}
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Prochaine échéance</span>
@@ -70,11 +65,11 @@ const LoanInfo = ({ loan }) => {
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Mensualité</span>
-          <span className="font-medium">{formatExactAmount(loan && loan.monthlyPayment ? loan.monthlyPayment : 0)}</span>
+          <span className="font-medium">{formatExactAmount(loan?.monthlyPayment)}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Taux</span>
-          <span className="font-medium">{loan && loan.interestRate ? loan.interestRate : 0}% annuel</span>
+          <span className="font-medium">{loan?.interestRate}% annuel</span>
         </div>
       </div>
     </div>
