@@ -17,6 +17,7 @@ const SimulationResultInline = ({ result }) => {
     if (score >= 6) return "text-orange-800";
     return "text-green-800";
   };
+  
   return (
     <p
       className={`w-full rounded-md px-3 py-2 mb-2 font-medium text-center ${getBackgroundColor(
