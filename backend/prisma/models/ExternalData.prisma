@@ -1,0 +1,8 @@
+model ExternalData {
+  id          Int      @id @default(autoincrement())
+  type        String   // "weather" ou "insee"
+  location    String   // département ou secteur
+  data        String   // JSON des données
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+}

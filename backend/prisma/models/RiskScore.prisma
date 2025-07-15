@@ -1,8 +1,11 @@
 model RiskScore {
-  id        Int      @id @default(autoincrement())
-  loanId    Int
-  score     Float
-  riskLevel String
-  date      DateTime
-  loan      Loan     @relation(fields: [loanId], references: [id])
+  id              Int      @id @default(autoincrement())
+  loanId          Int
+  score           Float
+  riskLevel       String
+  date            DateTime
+  weatherFactor   Float?
+  sectorFactor    Float?
+  externalFactors String? // JSON des autres facteurs
+  loan            Loan     @relation(fields: [loanId], references: [id])
 }
