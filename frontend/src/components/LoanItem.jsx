@@ -35,27 +35,27 @@ const LoanItem = ({ loan }) => {
             </h3>
           </div>
 
-          {/* Montant - responsive avec espace réduit */}
+          {/* Montant */}
           <div className="ml-2 md:ml-4 md:w-32 text-right flex-shrink-0">
             <span className="font-semibold text-gray-900 text-sm md:text-base">
               {formatAmountCompact(loan.amount)}
             </span>
           </div>
 
-          {/* Date d'échéance - masquée sur mobile, visible sur md+ */}
+          {/* Date d'échéance  */}
           <div className="hidden md:block md:w-44 text-center ml-4">
             <span className="text-sm text-gray-600">
               Échéance: {formatDate(loan.dueDate)}
             </span>
           </div>
 
-          {/* Taux d'intérêt - masqué sur mobile, visible sur md+ */}
+          {/* Taux d'intérêt */}
           <div className="hidden md:block md:w-16 text-center ml-4">
             <span className="text-sm text-gray-600">{loan.interestRate}%</span>
           </div>
         </div>
 
-        {/* Badge de risque - affiche le niveau de risque quand disponible */}
+        {/* Badge de risque */}
         <div className="flex-shrink-0 ml-2">
           <span className={`px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium border ${getRiskBadgeStyle(loan.riskLevel)}`}>
             {loan.riskLevel || "-"}
