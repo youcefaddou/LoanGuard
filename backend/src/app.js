@@ -50,6 +50,8 @@ app.use('/api/companies', companyRoutes)
 const loanRoute = require('./routes/loanRoute')
 app.use('/api/loans', loanRoute)
 
+app.use('/api/risk', require('./routes/riskRoute'))
+
 // Gestion des routes non trouvées
 app.use('*', (req, res) => {
   res.status(404).json({ 
