@@ -11,6 +11,7 @@ app.set('trust proxy', 1);
 
 // Middlewares globaux
 app.use(cors({
+  origin: process.env.FRONTEND_URL,
   credentials: true // Essentiel pour les cookies httpOnly
 }));
 
