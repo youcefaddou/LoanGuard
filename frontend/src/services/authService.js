@@ -7,7 +7,7 @@ const authService = {
   // Connexion utilisateur
   async login(credentials) {
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      const response = await fetch(API_URL + "/api/auth/login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
