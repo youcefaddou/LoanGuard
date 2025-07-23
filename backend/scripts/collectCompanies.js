@@ -1,5 +1,5 @@
 const sireneService = require('../src/services/sireneService');
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require('../generated/prisma');
 const axios = require('axios');
 
 const prisma = new PrismaClient();
