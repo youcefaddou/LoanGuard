@@ -238,21 +238,31 @@ const Header = ({ onAddLoan }) => {
                 ) : (
                   selectedBank && (
                     <div className="relative">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsBankMenuOpen(!isBankMenuOpen);
-                        }}
-                        className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md cursor-pointer"
-                      >
-                        <span className="text-gray-700 text-sm sm:text-base">
-                          {selectedBank.name.replace("BNP Paribas -", "")}
-                        </span>
-                        <ChevronDownIcon className="h-4 w-4 text-gray-500" />
-                      </button>
+                      {/* CHG: sélecteur grisé et non cliquable */}
+                      {user.role === "CHG" ? (
+                        <div className="flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-md cursor-not-allowed opacity-60">
+                          <span className="text-gray-700 text-sm sm:text-base">
+                            {selectedBank.name.replace("BNP Paribas -", "")}
+                          </span>
+                          <ChevronDownIcon className="h-4 w-4 text-gray-400" />
+                        </div>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsBankMenuOpen(!isBankMenuOpen);
+                          }}
+                          className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md cursor-not-allowed"
+                        >
+                          <span className="text-gray-700 text-sm sm:text-base">
+                            {selectedBank.name.replace("BNP Paribas -", "")}
+                          </span>
+                          <ChevronDownIcon className="h-4 w-4 text-gray-500" />
+                        </button>
+                      )}
 
-                      {/* Menu déroulant des agences */}
-                      {isBankMenuOpen && (
+                      {/* Menu déroulant des agences (RES uniquement) */}
+                      {isBankMenuOpen && user.role !== "CHG" && (
                         <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-48">
                           {availableBanks.map((bank) => (
                             <button
@@ -272,14 +282,19 @@ const Header = ({ onAddLoan }) => {
                   )
                 )}
               </div>
-
               {/* actions droite */}
               <div className="flex items-center space-x-2 sm:space-x-4">
                 {/* Bouton spécial selon page */}
                 {location.pathname === "/loans" && (
                   <button
-                    onClick={onAddLoan}
-                    className="bg-blue-800 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-blue-700 text-sm sm:text-base cursor-pointer">
+                    onClick={user.role === "CHG" ? undefined : onAddLoan}
+                    disabled={user.role === "CHG"}
+                    className={`bg-blue-800 text-white px-3 sm:px-4 py-2 rounded-md text-sm sm:text-base ${
+                      user.role === "CHG"
+                        ? "opacity-60 cursor-not-allowed"
+                        : "hover:bg-blue-700 cursor-pointer"
+                    }`}
+                  >
                     <span className="hidden sm:inline">Ajouter un prêt</span>
                     <span className="sm:hidden sm:text-sm">Ajout Prêt</span>
                   </button>
