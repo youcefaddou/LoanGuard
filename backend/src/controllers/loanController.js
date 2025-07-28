@@ -91,11 +91,14 @@ exports.getAllLoans = async (req, res) => {
   try {
     const bankId = req.headers["x-bank-id"];
 
+    // Correction : pour CHG, on filtre uniquement sur bankId
+    let whereClause = {};
+    if (bankId) {
+      whereClause.bankId = parseInt(bankId);
+    }
+    // Si RES, on peut filtrer sur bankId ou sur userId si besoin
     const loans = await prisma.loan.findMany({
-      where: {
-        userId: req.user.id,
-        bankId: bankId ? parseInt(bankId) : undefined,
-      },
+      where: whereClause,
       include: {
         company: {
           select: {
@@ -104,7 +107,6 @@ exports.getAllLoans = async (req, res) => {
         },
         riskScores: {
           orderBy: {
-            //récupère le dernier score de risque
             date: "desc",
           },
           take: 1,

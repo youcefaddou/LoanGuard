@@ -50,6 +50,24 @@ const Header = ({ onAddLoan }) => {
     }
   }, [user, location.pathname, availableBanks.length])
 
+  // Initialisation du selectedBank pour le CHG
+  useEffect(() => {
+    if (
+      user &&
+      user.role === "CHG" &&
+      !localStorage.getItem("selectedBank")
+    ) {
+      // Récupère les banques de l'utilisateur 
+      const userBanks = user.banks || []; 
+      if (userBanks.length === 1) {
+        localStorage.setItem("selectedBank", JSON.stringify(userBanks[0]));
+        localStorage.setItem("selectedBankId", userBanks[0].id);
+        // reload pour forcer la prise en compte
+        window.location.reload();
+      }
+    }
+  }, [user]);
+
   // Fermer les menus quand on clique ailleurs
   useEffect(() => {
     const handleClickOutside = () => {
