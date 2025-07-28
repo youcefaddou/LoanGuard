@@ -21,6 +21,7 @@ const LoanDetail = () => {
   const [loan, setLoan] = useState(null);
   const [error, setError] = useState(null);
   const [refreshRiskScore, setRefreshRiskScore] = useState(0);
+  const user = authService.getCurrentUser();
 
   const handleSimulationComplete = () => {
     setRefreshRiskScore(prev => prev + 1);
@@ -128,6 +129,7 @@ const LoanDetail = () => {
               ? loan.company.sector
               : null
           }
+          userRole={user ? user.role : "RES"} // Ajout du rôle utilisateur
         />
 
         <main className="flex-1 p-2 sm:p-3 lg:p-2">

@@ -4,6 +4,7 @@ const LoanDetailHeader = ({
   onEdit, 
   onDelete,
   companyName = "Entreprise ABC",
+  userRole = "RES" // Ajout de la prop userRole
 }) => {
   return (
     <div className="bg-white border-b border-gray-200 px-4 py-4">
@@ -36,14 +37,24 @@ const LoanDetailHeader = ({
               Exporter les détails du prêt
             </button>
             <button 
-              onClick={onEdit}
-              className="px-3 py-2 bg-blue-800 text-white rounded-md text-sm font-medium hover:bg-blue-600 transition-colors cursor-pointer"
+              onClick={userRole === "CHG" ? undefined : onEdit}
+              disabled={userRole === "CHG"}
+              className={`px-3 py-2 bg-blue-800 text-white rounded-md text-sm font-medium transition-colors ${
+                userRole === "CHG"
+                  ? "opacity-60 cursor-not-allowed"
+                  : "hover:bg-blue-600 cursor-pointer"
+              }`}
             >
               Modifier
             </button>
             <button 
-              onClick={onDelete}
-              className="px-3 py-2 bg-red-700 text-white rounded-md text-sm font-medium hover:bg-red-600 transition-colors cursor-pointer"
+              onClick={userRole === "CHG" ? undefined : onDelete}
+              disabled={userRole === "CHG"}
+              className={`px-3 py-2 bg-red-700 text-white rounded-md text-sm font-medium transition-colors ${
+                userRole === "CHG"
+                  ? "opacity-60 cursor-not-allowed"
+                  : "hover:bg-red-600 cursor-pointer"
+              }`}
             >
               Supprimer
             </button>
@@ -53,14 +64,24 @@ const LoanDetailHeader = ({
           <div className="flex md:hidden flex-col items-end space-y-2">
             <div className="flex space-x-2 w-full">
               <button 
-                onClick={onEdit}
-                className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer"
+                onClick={userRole === "CHG" ? undefined : onEdit}
+                disabled={userRole === "CHG"}
+                className={`flex-1 px-3 py-2 bg-blue-600 text-white rounded-md text-sm font-medium transition-colors ${
+                  userRole === "CHG"
+                    ? "opacity-60 cursor-not-allowed"
+                    : "hover:bg-blue-700 cursor-pointer"
+                }`}
               >
                 Modifier
               </button>
               <button 
-                onClick={onDelete}
-                className="flex-1 px-3 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 transition-colors cursor-pointer"
+                onClick={userRole === "CHG" ? undefined : onDelete}
+                disabled={userRole === "CHG"}
+                className={`flex-1 px-3 py-2 bg-red-600 text-white rounded-md text-sm font-medium transition-colors ${
+                  userRole === "CHG"
+                    ? "opacity-60 cursor-not-allowed"
+                    : "hover:bg-red-700 cursor-pointer"
+                }`}
               >
                 Supprimer
               </button>
