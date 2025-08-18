@@ -240,3 +240,62 @@ exports.deleteLoan = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la suppression du prêt" });
   }
 };
+
+exports.getWatchlist = async (req, res) => {
+  try {
+    //recuperer l'ID de la banque depuis le header
+    const bankId = req.headers["x-bank-id"];
+    if (!bankId) {
+      return res.status(400).json({
+        message: "ID de banque manquant",
+      });
+    }
+    //récuperer les prets a surveiller avec leurs derniers scores
+    const loans = await prisma.loan.findMany({
+      where: {
+        bankId: parseInt(bankId),
+        //exclure les prets terminés
+        status: { not: "COMPLETED" },
+      },
+      include: {
+        company: true,
+        riskScores: {
+          orderBy: { date: "desc" },
+          take: 1, //score le plus récent
+        },
+      },
+    });
+    //filtrer les prets qui ont un score de risque > 6.5
+    const watchlistLoans = loans
+      .filter((loan) => {
+        const latestScore = loan.riskScores[0];
+        return latestScore && latestScore.score > 6.5;
+      })
+      .sort((a, b) => {
+        // Trier par score décroissant (plus risqué en premier)
+        const scoreA = a.riskScores[0]?.score || 0;
+        const scoreB = b.riskScores[0]?.score || 0;
+        return scoreB - scoreA;
+      })
+      .slice(0, 5);
+
+    //formater les données pour le front
+    const formattedLoans = watchlistLoans.map((loan) => ({
+      id: loan.id,
+      companyName: loan.company.name,
+      amount: loan.amount,
+      endDate: loan.dueDate,
+      riskScore: loan.riskScores[0]?.score || 0,
+      riskLevel: loan.riskScores[0]?.riskLevel || "Inconnu",
+    }));
+    res.json({
+      message: "Liste de surveillance récupérée avec succès",
+      data: formattedLoans,
+    });
+  } catch (error) {
+    console.error("Erreur récupération watchlist:", error);
+    res.status(500).json({
+      message: "Erreur lors de la récupération de la liste de surveillance",
+    });
+  }
+};
