@@ -12,4 +12,7 @@ router.get('/history/:loanId', midAuth, riskController.getRiskHistory)
 //route pour mettre a jour tous les scores
 router.post('/update-all', midAuth, riskController.updateAllRiskScores)
 
+// Route pour récupérer l'évolution des scores de risque (dashboard)
+router.get('/evolution', midAuth, riskController.getRiskEvolution)
+
 module.exports = router

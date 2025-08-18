@@ -1,44 +1,128 @@
-const riskCalculationService = require('../services/riskCalculationService');
+const riskCalculationService = require("../services/riskCalculationService");
 const { PrismaClient } = require("../../generated/prisma");
 
 const prisma = new PrismaClient();
 
-exports.calculateRiskScore = riskCalculationService.calculateForApi
+exports.calculateRiskScore = riskCalculationService.calculateForApi;
 
 exports.getRiskHistory = async (req, res) => {
-    try {
-        const { loanId } = req.params;
-        
-        const riskScores = await prisma.riskScore.findMany({
-            where: { loanId: parseInt(loanId) },
-            orderBy: { date: "desc" },
-            take: 10 // Limiter aux 10 derniers scores
-        });
+  try {
+    const { loanId } = req.params;
 
-        res.json({
-            message: "Historique récupéré avec succès",
-            scores: riskScores
-        });
-    } catch (error) {
-        console.error("Erreur récupération historique:", error);
-        res.status(500).json({
-            message: "Erreur lors de la récupération de l'historique"
-        });
-    }
+    const riskScores = await prisma.riskScore.findMany({
+      where: { loanId: parseInt(loanId) },
+      orderBy: { date: "desc" },
+      take: 10, // Limiter aux 10 derniers scores
+    });
+
+    res.json({
+      message: "Historique récupéré avec succès",
+      scores: riskScores,
+    });
+  } catch (error) {
+    console.error("Erreur récupération historique:", error);
+    res.status(500).json({
+      message: "Erreur lors de la récupération de l'historique",
+    });
+  }
 };
 
 exports.updateAllRiskScores = async (req, res) => {
-    try {
-        const result = await riskCalculationService.updateAllRiskScores()
-        res.json({
-            message: "Scores de risque mis à jour",
-            success: result.success,
-            updated: result.updated
+  try {
+    const result = await riskCalculationService.updateAllRiskScores();
+    res.json({
+      message: "Scores de risque mis à jour",
+      success: result.success,
+      updated: result.updated,
+    });
+  } catch (error) {
+    console.error("Erreur mise à jour scores risque: ", error);
+    res.status(500).json({
+      message: "Erreur interne du serveur",
+    });
+  }
+};
+
+exports.getRiskEvolution = async (req, res) => {
+  try {
+    //recuperer les scores de risque des 7 derniers mois
+    const sevenMonthsAgo = new Date();
+    sevenMonthsAgo.setMonth(sevenMonthsAgo.getMonth() - 7);
+
+    const riskScores = await prisma.riskScore.findMany({
+      where: {
+        date: {
+          gte: sevenMonthsAgo,
+        },
+      },
+      include: {
+        loan: {
+          include: {
+            company: true,
+          },
+        },
+      },
+      orderBy: { date: "asc"}
+    });
+    //grouper les scores par mois
+    const monthlyData = {}
+    const sectorData = {}
+
+    riskScores.forEach(score => {
+        const month = new Date(score.date).toLocaleDateString('fr-FR', {
+            month: 'short',
+            year: '2-digit'
         })
-    } catch (error) {
-        console.error("Erreur mise à jour scores risque: ", error);
-        res.status(500).json({
-            message: "Erreur interne du serveur",
-        });
-    }
-}
+        if (!monthlyData[month]) {
+            monthlyData[month] = { scores: [], count: 0}
+        }
+        monthlyData[month].scores.push(score.score)
+        monthlyData[month].count++
+        //données sectorielles 
+        const sector = score.loan.company.sector || 'Autres'
+        if (!sectorData[month]) {
+            sectorData[month] = {}
+        }
+        if (!sectorData[month][sector]) {
+            sectorData[month][sector] = { scores: [], count: 0 }
+        }
+        sectorData[month][sector].scores.push(score.score)
+        sectorData[month][sector].count++
+    })
+    //calculer les moyennes mensuelles
+    const months = []
+    const averageScores = []
+    const sectorTrend = []
+    Object.keys(monthlyData).forEach(month => {
+        months.push(month)
+        //moyenne générale
+        const monthScores = monthlyData[month].scores
+        const average = monthScores.reduce((a, b) => a + b, 0) / monthScores.length
+        averageScores.push(Number(average.toFixed(1)))
+        
+        //moyenne sectorielle (secteur Agriculture)
+        let sectorAverage = average // Par défaut, même que la moyenne générale
+        if (sectorData[month]['Agriculture']) {
+            const sectorScores = sectorData[month]['Agriculture'].scores
+            sectorAverage = sectorScores.reduce((a, b) => a + b, 0) / sectorScores.length
+        }
+        sectorTrend.push(Number(sectorAverage.toFixed(1)))
+    })
+
+    res.json({
+        message: "Évolution récupérée avec succès",
+        data: {
+            months,
+            averageScores,
+            sectorTrend,
+            totalLoans: riskScores.length
+        }
+    })
+
+  } catch (error) {
+    console.error("Erreur récupération évolution:", error)
+    res.status(500).json({
+        message: "Erreur lors de la récupération de l'évolution"
+    })
+  }
+};

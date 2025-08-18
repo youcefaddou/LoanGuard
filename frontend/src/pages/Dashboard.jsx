@@ -2,7 +2,7 @@ import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import LoanWatchlist from "../components/LoanWatchlist";
 import QuickActions from "../components/QuickActions";
-import RiskChart from "../components/RiskChart";
+import RiskEvolutionChart from "../components/RiskEvolutionChart";
 import RiskMap from "../components/RiskMap";
 import Footer from "../components/Footer";
 
@@ -29,7 +29,7 @@ const Dashboard = () => {
 
             {/* Container 3 - Bottom Left: Évolution des scores */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-[400px]">
-              <RiskChart />
+              <RiskEvolutionChart />
             </div>
 
             {/* Container 4 - Bottom Right: Actions rapides */}
