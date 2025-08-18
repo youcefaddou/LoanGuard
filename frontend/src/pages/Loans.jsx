@@ -50,7 +50,7 @@ const Loans = () => {
     <div className="flex">
       <Sidebar />
       {/* Contenu principal */}
-      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen">
         <Header onAddLoan={() => setIsModalOpen(true)} />
         <main className="flex-1 p-2 sm:p-3 lg:p-2">
           {/* Contenu des prêts */}

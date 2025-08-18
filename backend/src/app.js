@@ -53,6 +53,7 @@ app.use('/api/loans', loanRoute)
 app.use('/api/risk', require('./routes/riskRoute'))
 
 app.use('/api/simulation', require('./routes/simulationRoute'))
+app.use('/api/alerts', require('./routes/alertRoute'))
 
 // Gestion des routes non trouvées
 app.use('*', (req, res) => {

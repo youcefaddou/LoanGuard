@@ -35,11 +35,21 @@ const riskCalculationService = {
           timeRatio: features[8],
         }),
       };
-      
+
       const savedRiskScore = await prisma.riskScore.create({
-        data: riskScoreData
+        data: riskScoreData,
       });
-      
+      // Créer une alerte pour la mise à jour du score de risque
+      await prisma.alert.create({
+        data: {
+          loanId: loan.id,
+          type: "info",
+          message: `Score de risque mis à jour: ${
+            prediction.riskLevel
+          } (${prediction.score.toFixed(1)}/10)`,
+          date: new Date(),
+        },
+      });
       return {
         success: true,
         data: savedRiskScore,
@@ -80,7 +90,7 @@ const riskCalculationService = {
       // Vérifier s'il existe déjà un score de risque pour ce prêt
       const existingRiskScore = await prisma.riskScore.findFirst({
         where: { loanId: parseInt(loanId) },
-        orderBy: { date: 'desc' }
+        orderBy: { date: "desc" },
       });
 
       if (!existingRiskScore) {
@@ -95,7 +105,7 @@ const riskCalculationService = {
         score: existingRiskScore.score,
         evolution: 0, // Pour le moment, on met 0 en attendant d'implémenter le calcul d'évolution
         riskLevel: existingRiskScore.riskLevel,
-        date: existingRiskScore.date
+        date: existingRiskScore.date,
       });
     } catch (error) {
       console.error("Erreur calcul risque API: ", error);

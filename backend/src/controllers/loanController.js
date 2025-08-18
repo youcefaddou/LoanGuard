@@ -1,7 +1,6 @@
-const { PrismaClient } = require("../../generated/prisma")
-const prisma = new PrismaClient()
-const { generatePaymentHistory } = require("../utils/generatePayments")
-
+const { PrismaClient } = require("../../generated/prisma");
+const prisma = new PrismaClient();
+const { generatePaymentHistory } = require("../utils/generatePayments");
 
 exports.createLoan = async (req, res) => {
   try {
@@ -56,7 +55,17 @@ exports.createLoan = async (req, res) => {
     });
     //générer automatiquement l'historique des paiements
     await generatePaymentHistory(newLoan);
-    
+    // Créer une alerte pour le nouveau prêt
+    await prisma.alert.create({
+      data: {
+        loanId: newLoan.id,
+        type: "info",
+        message: `Nouveau prêt créé pour ${
+          newLoan.company.name
+        } - Montant: ${newLoan.amount.toLocaleString("fr-FR")}€`,
+        date: new Date(),
+      },
+    });
     res.status(201).json({
       message: "Prêt créé avec succès",
       loan: newLoan,
@@ -191,33 +200,33 @@ exports.updateLoan = async (req, res) => {
       },
       include: {
         company: true,
-        payments: true
-      } 
-    })
-    res.json({message: "Prêt mis à jour avec succès", loan: updateLoan })
+        payments: true,
+      },
+    });
+    res.json({ message: "Prêt mis à jour avec succès", loan: updateLoan });
   } catch (error) {
     console.error("Erreur lors de la mise à jour du prêt:", error);
     res.status(500).json({ message: "Erreur lors de la mise à jour du prêt" });
   }
-}
+};
 exports.deleteLoan = async (req, res) => {
-  const { id } = req.params
+  const { id } = req.params;
   try {
     const existingLoan = await prisma.loan.findUnique({
       where: { id: parseInt(id) },
-    })
+    });
     if (!existingLoan) {
       return res.status(404).json({ message: "Prêt non trouvé" });
     }
     await prisma.payment.deleteMany({
       where: { loanId: parseInt(id) },
-    })
+    });
     await prisma.loan.delete({
       where: { id: parseInt(id) },
-    })
-    res.json({ message: "Prêt supprimé avec succès" })
+    });
+    res.json({ message: "Prêt supprimé avec succès" });
   } catch (error) {
     console.error("Erreur lors de la suppression du prêt:", error);
     res.status(500).json({ message: "Erreur lors de la suppression du prêt" });
   }
-}
+};

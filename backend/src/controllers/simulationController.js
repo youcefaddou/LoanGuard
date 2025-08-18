@@ -52,8 +52,9 @@ exports.runSimulation = async (req, res) => {
 
     // Créer un RiskScore avec le résultat de la simulation
     const scoreAfter = Math.min(10, Math.max(0, baseScore + impact));
-    const newRiskLevel = scoreAfter >= 8 ? "Élevé" : scoreAfter >= 6 ? "Moyen" : "Faible";
-    
+    const newRiskLevel =
+      scoreAfter >= 8 ? "Élevé" : scoreAfter >= 6 ? "Moyen" : "Faible";
+
     await prisma.riskScore.create({
       data: {
         loanId: loan.id,
@@ -65,7 +66,17 @@ exports.runSimulation = async (req, res) => {
         externalFactors: JSON.stringify({ simulationImpact: impact }),
       },
     });
-
+    // Créer une alerte pour la simulation effectuée
+    await prisma.alert.create({
+      data: {
+        loanId: loan.id,
+        type: impact > 0 ? "warning" : "success",
+        message: `Simulation ${getEventTypeLabel(eventType)} effectuée: ${
+          impact > 0 ? "Risque augmenté" : "Risque diminué"
+        } de ${Math.abs(impact).toFixed(1)} points`,
+        date: new Date(),
+      },
+    });
     res.json({
       message: "Simulation réussie",
       simulation,
@@ -81,6 +92,19 @@ exports.runSimulation = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la simulation" });
   }
 };
+
+function getEventTypeLabel(eventType) {
+  switch (eventType) {
+    case "weather":
+      return "météorologique";
+    case "economic":
+      return "économique";
+    case "regulatory":
+      return "réglementaire";
+    default:
+      return eventType;
+  }
+}
 
 exports.getSimulationHistory = async (req, res) => {
   try {
@@ -118,14 +142,17 @@ function calculateEventImpact(eventType, parameters, sector) {
       } else if (parameters.type === "inondation") {
         impact = parameters.intensity * 1.2;
       } else if (parameters.type === "gel") {
-        if (sector.includes("Commerce alimentaire") || sector.includes("Culture")) {
+        if (
+          sector.includes("Commerce alimentaire") ||
+          sector.includes("Culture")
+        ) {
           // Le gel affecte particulièrement l'alimentaire et l'agriculture
           impact = parameters.intensity * 1.8;
         } else {
           impact = parameters.intensity * 0.6;
         }
       }
-      
+
       // Permettre des impacts négatifs pour conditions favorables (intensité très faible)
       if (parameters.intensity < 0.5) {
         impact = -0.5; // Conditions favorables réduisent le risque
@@ -138,7 +165,7 @@ function calculateEventImpact(eventType, parameters, sector) {
       } else if (parameters.type === "hausse_taux") {
         impact = parameters.severity * 1.5;
       }
-      
+
       // Permettre des impacts négatifs pour conditions économiques favorables
       if (parameters.severity < 0.7) {
         impact = -0.3; // Conditions économiques favorables
@@ -147,13 +174,13 @@ function calculateEventImpact(eventType, parameters, sector) {
 
     case "regulatory":
       if (parameters.type === "nouvelle_reglementation") {
-        impact = parameters.severity * 1.5; 
+        impact = parameters.severity * 1.5;
       } else if (parameters.type === "changement_fiscal") {
-        impact = parameters.severity * 2.0; 
+        impact = parameters.severity * 2.0;
       } else if (parameters.type === "reforme_bancaire") {
-        impact = parameters.severity * 2.5; 
+        impact = parameters.severity * 2.5;
       }
-      
+
       // Permettre des impacts négatifs pour réglementations favorables
       if (parameters.severity < 0.7) {
         impact = -0.2; // Réglementation favorable
@@ -163,7 +190,7 @@ function calculateEventImpact(eventType, parameters, sector) {
     default:
       impact = 0.5;
   }
-  
+
   // Permettre des impacts négatifs mais limiter la plage
   return Math.max(-2, Math.min(impact, 3));
 }

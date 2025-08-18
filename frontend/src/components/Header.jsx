@@ -1,39 +1,41 @@
-import { useState, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
-import authService from "../services/authService"
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import authService from "../services/authService";
 import {
   BellIcon,
   ChevronDownIcon,
   Bars3Icon,
   XMarkIcon,
-} from "@heroicons/react/24/outline"
-
+} from "@heroicons/react/24/outline";
 
 const Header = ({ onAddLoan }) => {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate = useNavigate();
+  const location = useLocation();
 
   //récuperer les données de l'user depuis le service
-  const user = authService.getCurrentUser()
+  const user = authService.getCurrentUser();
   //récuperer les données de la banque sélectionnée
-  const selectedBank = JSON.parse(localStorage.getItem("selectedBank"))
+  const selectedBank = JSON.parse(localStorage.getItem("selectedBank"));
 
   //état pour les menus
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isLogoutMenuOpen, setIsLogoutMenuOpen] = useState(false)
-  const [isBankMenuOpen, setIsBankMenuOpen] = useState(false)
-  const [availableBanks, setAvailableBanks] = useState([]) // pour les banques dispo
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLogoutMenuOpen, setIsLogoutMenuOpen] = useState(false);
+  const [isBankMenuOpen, setIsBankMenuOpen] = useState(false);
+  const [availableBanks, setAvailableBanks] = useState([]); // pour les banques dispo
 
   useEffect(() => {
     const fetchBanks = async () => {
       try {
         // ne faire l'appel que si on n'a pas déjà des banques et qu'on est sur une page avec sélecteur
-        const pagesWithBankSelector = ['/dashboard', '/companies'];
-        if (availableBanks.length === 0 && pagesWithBankSelector.includes(location.pathname)) {
+        const pagesWithBankSelector = ["/dashboard", "/companies"];
+        if (
+          availableBanks.length === 0 &&
+          pagesWithBankSelector.includes(location.pathname)
+        ) {
           const response = await authService.secureRequest("/api/banks", {
-            method: 'GET'
+            method: "GET",
           });
-          
+
           if (response && response.ok) {
             const result = await response.json();
             setAvailableBanks(result.banks || result);
@@ -43,22 +45,18 @@ const Header = ({ onAddLoan }) => {
         console.error("Erreur récupération banques:", error);
       }
     };
-    
-    const pagesWithBankSelector = ['/dashboard', '/companies'];
+
+    const pagesWithBankSelector = ["/dashboard", "/companies"];
     if (user && pagesWithBankSelector.includes(location.pathname)) {
       fetchBanks();
     }
-  }, [user, location.pathname, availableBanks.length])
+  }, [user, location.pathname, availableBanks.length]);
 
   // Initialisation du selectedBank pour le CHG
   useEffect(() => {
-    if (
-      user &&
-      user.role === "CHG" &&
-      !localStorage.getItem("selectedBank")
-    ) {
-      // Récupère les banques de l'utilisateur 
-      const userBanks = user.banks || []; 
+    if (user && user.role === "CHG" && !localStorage.getItem("selectedBank")) {
+      // Récupère les banques de l'utilisateur
+      const userBanks = user.banks || [];
       if (userBanks.length === 1) {
         localStorage.setItem("selectedBank", JSON.stringify(userBanks[0]));
         localStorage.setItem("selectedBankId", userBanks[0].id);
@@ -72,7 +70,7 @@ const Header = ({ onAddLoan }) => {
   useEffect(() => {
     const handleClickOutside = () => {
       setIsBankMenuOpen(false);
-      setIsLogoutMenuOpen(false)
+      setIsLogoutMenuOpen(false);
       setIsMobileMenuOpen(false);
     };
 
@@ -102,7 +100,7 @@ const Header = ({ onAddLoan }) => {
   //determiner le titre de la page
   const getPageTitle = () => {
     if (location.pathname === "/dashboard") return null;
-    if (location.pathname === "/companies") return null; 
+    if (location.pathname === "/companies") return null;
     if (location.pathname === "/loans") return "Gestion des prêts";
     if (location.pathname === "/simulator") return "Simulation d'impact";
     if (location.pathname === "/settings") return "Gestion des Utilisateurs";
@@ -172,7 +170,11 @@ const Header = ({ onAddLoan }) => {
 
                   {/*menu burger mobile */}
                   <button
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    onClick={() => {
+                      setIsMobileMenuOpen(!isMobileMenuOpen);
+                      // Déclencher l'événement pour la Sidebar
+                      window.dispatchEvent(new CustomEvent("toggleMobileMenu"));
+                    }}
                     className="md:hidden p-2 text-gray-600 hover:text-gray-900"
                   >
                     {isMobileMenuOpen ? (
@@ -230,7 +232,22 @@ const Header = ({ onAddLoan }) => {
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               {/* Titre de page OU Sélecteur d'agence */}
-              <div className="flex items-center">
+              <div className="flex items-center space-x-4">
+                {/* Menu burger */}
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(!isMobileMenuOpen);
+                    // Déclencher l'événement pour la Sidebar
+                    window.dispatchEvent(new CustomEvent("toggleMobileMenu"));
+                  }}
+                  className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
+                >
+                  {isMobileMenuOpen ? (
+                    <XMarkIcon className="h-6 w-6" />
+                  ) : (
+                    <Bars3Icon className="h-6 w-6" />
+                  )}
+                </button>
                 {getPageTitle() ? (
                   <h1 className="text-lg sm:text-xl font-bold text-gray-900">
                     {getPageTitle()}

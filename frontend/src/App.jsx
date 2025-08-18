@@ -6,6 +6,8 @@ import Loans from './pages/Loans';
 import Companies from './pages/Companies';
 import LoanDetail from './pages/LoanDetail';
 import Simulator from './pages/Simulator';
+import Alerts from './pages/Alerts';
+
 function App() {
   return (
     <Router>
@@ -17,6 +19,8 @@ function App() {
         <Route path="/companies" element={<Companies />} />
         <Route path="/loans/:id" element={<LoanDetail />} />
         <Route path="/simulator" element={<Simulator />} />
+        <Route path="/alerts" element={<Alerts />} />
+        
       </Routes>
     </Router>
   );
