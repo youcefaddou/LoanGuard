@@ -45,7 +45,16 @@ exports.updateAllRiskScores = async (req, res) => {
 
 exports.getRiskEvolution = async (req, res) => {
   try {
-    //recuperer les scores de risque des 7 derniers mois
+    // Récupérer l'ID de la banque depuis le header
+    const bankId = req.headers['x-bank-id'];
+    
+    if (!bankId) {
+      return res.status(400).json({
+        message: "ID de banque manquant"
+      });
+    }
+
+    //recuperer les scores de risque des 7 derniers mois pour cette banque
     const sevenMonthsAgo = new Date();
     sevenMonthsAgo.setMonth(sevenMonthsAgo.getMonth() - 7);
 
@@ -54,6 +63,9 @@ exports.getRiskEvolution = async (req, res) => {
         date: {
           gte: sevenMonthsAgo,
         },
+        loan: {
+          bankId: parseInt(bankId) // filtrer par banque
+        }
       },
       include: {
         loan: {
