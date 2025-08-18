@@ -218,7 +218,17 @@ exports.deleteLoan = async (req, res) => {
     if (!existingLoan) {
       return res.status(404).json({ message: "Prêt non trouvé" });
     }
+    // Supprimer toutes les données liées au prêt
     await prisma.payment.deleteMany({
+      where: { loanId: parseInt(id) },
+    });
+    await prisma.alert.deleteMany({
+      where: { loanId: parseInt(id) },
+    });
+    await prisma.riskScore.deleteMany({
+      where: { loanId: parseInt(id) },
+    });
+    await prisma.simulation.deleteMany({
       where: { loanId: parseInt(id) },
     });
     await prisma.loan.delete({

@@ -269,7 +269,7 @@ const Header = ({ onAddLoan }) => {
                             e.stopPropagation();
                             setIsBankMenuOpen(!isBankMenuOpen);
                           }}
-                          className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md cursor-not-allowed"
+                          className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md cursor-pointer"
                         >
                           <span className="text-gray-700 text-sm sm:text-base">
                             {selectedBank.name.replace("BNP Paribas -", "")}

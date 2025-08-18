@@ -8,10 +8,8 @@ const generatePaymentHistory = async (loan) => {
     const today = new Date();
 
     const loanEndDate = new Date(loan.dueDate);
-    // Générer au minimum un paiement de plus que la date actuelle
-    const nextMonth = new Date(today);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    const endDate = nextMonth < loanEndDate ? nextMonth : loanEndDate;
+    // Générer les paiements jusqu'à aujourd'hui ou la fin du prêt
+    const endDate = today < loanEndDate ? today : loanEndDate;
 
     let paymentCount = 0;
 
