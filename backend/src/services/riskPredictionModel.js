@@ -50,7 +50,7 @@ const riskPredictionModel = {
             //convertir les données en tenseurs
             const xs = tf.tensor2d(features)
             const ys = tf.tensor2d(labels, [labels.length, 1])
-            const model = this.createModel()
+            const model = riskPredictionModel.createModel()
             await model.fit(xs, ys, {
                 epochs: 50,
                 batchSize: 32,
@@ -100,7 +100,7 @@ const riskPredictionModel = {
     predict: async (loanFeatures, model = null) => {
         try {
             if (!model) {
-                model = await this.loadModel()
+                model = await riskPredictionModel.loadModel()
                 if (!model) {
                     throw new Error('Aucun modèle chargé')
                 }

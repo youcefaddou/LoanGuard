@@ -88,18 +88,28 @@ const riskCalculationService = {
       }
 
       // Vérifier s'il existe déjà un score de risque pour ce prêt
-      const existingRiskScore = await prisma.riskScore.findFirst({
+      let existingRiskScore = await prisma.riskScore.findFirst({
         where: { loanId: parseInt(loanId) },
         orderBy: { date: "desc" },
       });
 
+      // Si aucun score n'existe, calculer un nouveau score
       if (!existingRiskScore) {
-        return res.status(404).json({
-          message: "Aucune simulation n'a été lancée pour ce prêt",
-        });
+        console.log(`Aucun score de risque trouvé pour le prêt ${loanId}, calcul en cours...`);
+        
+        // Calculer un nouveau score de risque
+        const newRiskScore = await riskCalculationService.calculateRiskScore(parseInt(loanId));
+        
+        if (!newRiskScore) {
+          return res.status(500).json({
+            message: "Erreur lors du calcul du score de risque",
+          });
+        }
+        
+        existingRiskScore = newRiskScore;
       }
 
-      // Retourner le score existant
+      // Retourner le score (existant ou nouveau)
       res.json({
         message: "Score de risque récupéré avec succès",
         score: existingRiskScore.score,
