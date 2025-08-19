@@ -1,9 +1,11 @@
 import { ArrowDownTrayIcon, PlayIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SimulatorModal from './SimulatorModal';
 
 const QuickActions = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleSimulateEvent = () => {
     setIsModalOpen(true);
@@ -14,7 +16,7 @@ const QuickActions = () => {
   };
 
   const handleAdvancedSettings = () => {
-    // Navigation vers paramètres avancés à implémenter
+    navigate('/settings');
   };
 
   return (
@@ -47,7 +49,7 @@ const QuickActions = () => {
           className="w-full px-3 py-3 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-center gap-2 sm:text-base"
         >
           <Cog6ToothIcon className="w-5 h-5" />
-          <span className="hidden sm:inline">Paramètres avancés</span>
+          <span className="hidden sm:inline">Paramètres</span>
           <span className="sm:hidden">Paramètres</span>
         </button>
       </div>
