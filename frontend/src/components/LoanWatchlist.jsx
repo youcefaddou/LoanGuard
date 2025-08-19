@@ -54,10 +54,26 @@ const LoanWatchlist = () => {
 
   // Formater la date
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-    });
+    if (!dateString) {
+      return "Non définie";
+    }
+    
+    try {
+      const date = new Date(dateString);
+      // Vérifier si la date est valide
+      if (isNaN(date.getTime())) {
+        return "Date invalide";
+      }
+      
+      return date.toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+    } catch (error) {
+      console.error("Erreur lors du formatage de la date:", error);
+      return "Erreur date";
+    }
   };
 
   if (loading) {
@@ -112,7 +128,7 @@ const LoanWatchlist = () => {
                 </h4>
                 <p className="text-sm text-gray-500">
                   {formatAmount(loan.amount)} - Échéance{" "}
-                  {formatDate(loan.dueDate)}
+                  {formatDate(loan.endDate)}
                 </p>
               </div>
               <div className="ml-4">

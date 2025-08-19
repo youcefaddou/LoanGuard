@@ -38,7 +38,22 @@ const riskService = {
       console.error('Erreur lors du calcul du score de risque:', error);
       throw error;
     }
+  },
+
+  // Entraîner le modèle IA (temporaire)
+  trainModel: async () => {
+    try {
+      const response = await authService.secureRequest('/api/risk/train-model', {
+        method: 'POST',
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Erreur lors de l\'entraînement du modèle:', error);
+      throw error;
+    }
   }
 };
 
 export default riskService;
+
+

@@ -284,7 +284,7 @@ exports.getWatchlist = async (req, res) => {
       id: loan.id,
       companyName: loan.company.name,
       amount: loan.amount,
-      endDate: loan.dueDate,
+      endDate: loan.dueDate ? loan.dueDate.toISOString() : null,
       riskScore: loan.riskScores[0]?.score || 0,
       riskLevel: loan.riskScores[0]?.riskLevel || "Inconnu",
     }));

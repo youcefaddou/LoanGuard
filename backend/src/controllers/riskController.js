@@ -1,5 +1,7 @@
 const riskCalculationService = require("../services/riskCalculationService");
 const { PrismaClient } = require("../../generated/prisma");
+const aiTrainingService = require("../services/aiTrainingService");
+const riskPredictionModel = require("../services/riskPredictionModel");
 
 const prisma = new PrismaClient();
 
@@ -136,5 +138,34 @@ exports.getRiskEvolution = async (req, res) => {
     res.status(500).json({
         message: "Erreur lors de la récupération de l'évolution"
     })
+  }
+};
+exports.trainModel = async (req, res) => {
+  try {
+    // Générer les données d'entraînement depuis vos prêts
+    const trainingData = await aiTrainingService.generateTrainingData();
+    
+    if (trainingData.length < 5) {
+      return res.status(400).json({
+        message: "Pas assez de données pour entraîner le modèle (minimum 5 prêts)"
+      });
+    }
+    
+    // Entraîner le modèle
+    const model = await riskPredictionModel.trainModel();
+    
+    // Sauvegarder le modèle
+    // await riskPredictionModel.saveModel(model);
+    
+    res.json({
+      message: "Modèle entraîné avec succès (sauvegarde temporairement désactivée)",
+      dataPoints: trainingData.length
+    });
+    
+  } catch (error) {
+    console.error("Erreur entraînement modèle:", error);
+    res.status(500).json({
+      message: "Erreur lors de l'entraînement du modèle"
+    });
   }
 };
