@@ -82,6 +82,7 @@ exports.createUser = async (req, res) => {
     // Hasher le mot de passe
     const hashedPassword = await argon2.hash(password);
 
+    // Créer l'utilisateur et la relation UserBank en une seule transaction
     const newUser = await prisma.user.create({
       data: {
         firstName: firstName,
@@ -89,17 +90,18 @@ exports.createUser = async (req, res) => {
         email: email,
         password: hashedPassword,
         role: role,
-        bankId: parseInt(bankId),
-        isActive: true
+        userBanks: {
+          create: {
+            bankId: parseInt(bankId)
+          }
+        }
       },
       select: {
         id: true,
         firstName: true,
         lastName: true,
         email: true,
-        role: true,
-        isActive: true,
-        createdAt: true
+        role: true
       }
     });
 
@@ -121,7 +123,11 @@ exports.updateUser = async (req, res) => {
   try {
     const userId = parseInt(req.params.id);
     const bankId = req.headers['x-bank-id'];
-    const { firstName, lastName, email, role, isActive } = req.body;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const email = req.body.email;
+    const role = req.body.role;
+    const password = req.body.password;
 
     if (!bankId) {
       return res.status(400).json({
@@ -129,18 +135,40 @@ exports.updateUser = async (req, res) => {
       });
     }
 
-    // Vérifier que l'utilisateur connecté est un RES
-    if (req.user.role !== 'RES') {
+    // Vérifier les permissions
+    const isRES = req.user.role === 'RES';
+    const isOwnProfile = req.user.id === userId;
+    
+    if (!isRES && !isOwnProfile) {
       return res.status(403).json({
-        message: "Accès refusé : seuls les responsables peuvent modifier des utilisateurs"
+        message: "Accès refusé : vous ne pouvez modifier que votre propre profil"
       });
+    }
+
+    // Si CHG modifie son propre profil, vérifier qu'il ne change que email/password
+    if (!isRES && isOwnProfile) {
+      const currentUser = await prisma.user.findUnique({
+        where: { id: userId }
+      });
+      
+      if (firstName !== currentUser.firstName || 
+          lastName !== currentUser.lastName || 
+          role !== currentUser.role) {
+        return res.status(403).json({
+          message: "Vous ne pouvez modifier que votre email et mot de passe"
+        });
+      }
     }
 
     // Vérifier que l'utilisateur existe et appartient à la banque
     const existingUser = await prisma.user.findFirst({
       where: {
         id: userId,
-        bankId: parseInt(bankId)
+        userBanks: {
+          some: {
+            bankId: parseInt(bankId)
+          }
+        }
       }
     });
 
@@ -150,24 +178,31 @@ exports.updateUser = async (req, res) => {
       });
     }
 
+    // Préparer les données à mettre à jour
+    const updateData = {
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      role: role
+    };
+
+    // Ajouter le mot de passe seulement s'il est fourni
+    if (password) {
+      const hashedPassword = await argon2.hash(password);
+      updateData.password = hashedPassword;
+    }
+
     const updatedUser = await prisma.user.update({
       where: {
         id: userId
       },
-      data: {
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        role: role,
-        isActive: isActive
-      },
+      data: updateData,
       select: {
         id: true,
         firstName: true,
         lastName: true,
         email: true,
-        role: true,
-        isActive: true
+        role: true
       }
     });
 
@@ -207,7 +242,11 @@ exports.deleteUser = async (req, res) => {
     const existingUser = await prisma.user.findFirst({
       where: {
         id: userId,
-        bankId: parseInt(bankId)
+        userBanks: {
+          some: {
+            bankId: parseInt(bankId)
+          }
+        }
       }
     });
 
@@ -217,6 +256,14 @@ exports.deleteUser = async (req, res) => {
       });
     }
 
+    // Supprimer d'abord les relations UserBank
+    await prisma.userBank.deleteMany({
+      where: {
+        userId: userId
+      }
+    });
+
+    // Puis supprimer l'utilisateur
     await prisma.user.delete({
       where: {
         id: userId

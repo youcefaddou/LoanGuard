@@ -103,7 +103,7 @@ const Sidebar = () => {
             onClick={() => setIsMobileOpen(false)}
           >
             {/* Background overlay */}
-            <div className="fixed inset-0 bg-gray-600 bg-opacity-75"></div>
+            <div className="fixed inset-0  bg-gray-500/30 backdrop-blur-sm bg-opacity-75"></div>
 
             {/* Sidebar panel */}
             <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white border-r border-gray-200">

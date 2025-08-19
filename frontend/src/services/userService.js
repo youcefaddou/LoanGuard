@@ -5,17 +5,12 @@ const userService = {
     try {
       const response = await authService.secureRequest('/api/users');
       
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-      
       if (!response.ok) {
         const errorData = await response.json();
-        console.log('Error response:', errorData);
         throw new Error(errorData.message || 'Erreur lors de la récupération des utilisateurs');
       }
       
       const data = await response.json();
-      console.log('Success data:', data);
       return data;
     } catch (error) {
       console.error('Erreur getUsers:', error);

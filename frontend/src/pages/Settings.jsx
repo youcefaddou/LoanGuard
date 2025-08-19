@@ -4,6 +4,8 @@ import riskService from "../services/riskService";
 import userService from "../services/userService";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+import UserModal from "../components/UserModal";
+import DeleteUserModal from "../components/DeleteUserModal";
 
 const Settings = () => {
   const [isTraining, setIsTraining] = useState(false);
@@ -12,6 +14,11 @@ const Settings = () => {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   const user = authService.getCurrentUser();
 
   const handleTrainModel = async () => {
@@ -37,7 +44,6 @@ const Settings = () => {
     try {
       setIsLoading(true);
       setError("");
-
       const response = await userService.getUsers();
       setUsers(response.users);
     } catch (err) {
@@ -47,7 +53,41 @@ const Settings = () => {
       setIsLoading(false);
     }
   };
+  const handleAddUser = () => {
+    setSelectedUser(null);
+    setIsEditing(false);
+    setIsUserModalOpen(true);
+  };
 
+  const handleEditUser = (user) => {
+    setSelectedUser(user);
+    setIsEditing(true);
+    setIsUserModalOpen(true);
+  };
+  const handleDeleteUser = (user) => {
+    setUserToDelete(user);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteUser = async () => {
+    try {
+      await userService.deleteUser(userToDelete.id);
+      await fetchUsers();
+      setIsDeleteModalOpen(false);
+      setUserToDelete(null);
+    } catch (error) {
+      console.error("Erreur suppression:", error);
+    }
+  };
+
+  const handleSaveUser = async (userData) => {
+    if (isEditing) {
+      await userService.updateUser(selectedUser.id, userData);
+    } else {
+      await userService.createUser(userData);
+    }
+    await fetchUsers(); // Pour rafraîchir la liste
+  };
   //charger les utilisateurs au démarrage de la page
   useEffect(() => {
     fetchUsers();
@@ -70,7 +110,10 @@ const Settings = () => {
                     Utilisateurs
                   </h1>
                   {user.role === "RES" && (
-                    <button className="bg-blue-800 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-900 hover:cursor-pointer">
+                    <button
+                      onClick={handleAddUser}
+                      className="bg-blue-800 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-900 hover:cursor-pointer"
+                    >
                       Ajouter un utilisateur
                     </button>
                   )}
@@ -88,9 +131,6 @@ const Settings = () => {
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Rôle
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Statut
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Actions
@@ -126,34 +166,62 @@ const Settings = () => {
                           </td>
                         </tr>
                       ) : (
-                        users.map((user) => (
-                          <tr key={user.id}>
+                        users.map((userItem) => (
+                          <tr key={userItem.id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {user.firstName} {user.lastName}
+                              {userItem.firstName} {userItem.lastName}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {user.email}
+                              {userItem.email}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {user.role === "RES"
+                              {userItem.role === "RES"
                                 ? "Responsable"
                                 : "Chargé de risques"}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                Actif
-                              </span>
-                            </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              {user.role === "RES" && (
-                                <>
-                                  <button className="text-blue-600 hover:text-blue-900 mr-4">
-                                    Modifier
-                                  </button>
-                                  <button className="text-red-600 hover:text-red-900">
-                                    Supprimer
-                                  </button>
-                                </>
+                              {/* Logique pour CHG vs RES */}
+                              {user.role === "CHG" ? (
+                                /* CHG peut seulement modifier sa propre ligne */
+                                user.id === userItem.id ? (
+                                  <>
+                                    <button
+                                      onClick={() => handleEditUser(userItem)}
+                                      className="text-blue-600 hover:text-blue-900 mr-4"
+                                    >
+                                      Modifier
+                                    </button>
+                                    <button
+                                      disabled
+                                      className="text-gray-400 cursor-not-allowed"
+                                      title="Vous ne pouvez pas supprimer votre propre compte"
+                                    >
+                                      Supprimer
+                                    </button>
+                                  </>
+                                ) : (
+                                  <span className="text-gray-400">Accès restreint</span>
+                                )
+                              ) : (
+                                /* RES peut tout faire */
+                                user.role === "RES" ? (
+                                  <>
+                                    <button
+                                      onClick={() => handleEditUser(userItem)}
+                                      className="text-blue-600 hover:text-blue-900 mr-4"
+                                    >
+                                      Modifier
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteUser(userItem)}
+                                      className="text-red-600 hover:text-red-900"
+                                    >
+                                      Supprimer
+                                    </button>
+                                  </>
+                                ) : (
+                                  <span className="text-gray-400">Accès restreint</span>
+                                )
                               )}
                             </td>
                           </tr>
@@ -236,6 +304,21 @@ const Settings = () => {
               </div>
             </div>
           </div>
+          <UserModal
+            isOpen={isUserModalOpen}
+            onClose={() => setIsUserModalOpen(false)}
+            onSave={handleSaveUser}
+            user={selectedUser}
+            isEditing={isEditing}
+            isOwnProfile={user.role === "CHG" && isEditing && user.id === selectedUser?.id}
+          />
+
+          <DeleteUserModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirm={confirmDeleteUser}
+            user={userToDelete}
+          />
         </main>
       </div>
     </div>
