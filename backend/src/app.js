@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser'); // Pour les cookies httpOnly
 require('dotenv').config();
 
 const app = express();
+const userRoutes = require('./routes/userRoute');
 
 // Configuration pour récupérer la vraie IP (rate limiting)
 app.set('trust proxy', 1);
@@ -44,6 +45,8 @@ app.get('/api/health', (req, res) => {
     version: '1.0.0'
   });
 });
+
+app.use('/api/users', userRoutes);
 const companyRoutes = require('./routes/companyRoute')
 app.use('/api/companies', companyRoutes)
 

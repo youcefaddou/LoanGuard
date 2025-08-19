@@ -7,6 +7,7 @@ import Companies from './pages/Companies';
 import LoanDetail from './pages/LoanDetail';
 import Simulator from './pages/Simulator';
 import Alerts from './pages/Alerts';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/loans/:id" element={<LoanDetail />} />
         <Route path="/simulator" element={<Simulator />} />
         <Route path="/alerts" element={<Alerts />} />
+        <Route path="/settings" element={<Settings />} />
         
       </Routes>
     </Router>
