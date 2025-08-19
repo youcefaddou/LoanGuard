@@ -187,7 +187,7 @@ const Settings = () => {
                                   <>
                                     <button
                                       onClick={() => handleEditUser(userItem)}
-                                      className="text-blue-600 hover:text-blue-900 mr-4"
+                                      className="text-blue-600 hover:text-blue-900 hover:cursor-pointer mr-4"
                                     >
                                       Modifier
                                     </button>
@@ -208,13 +208,13 @@ const Settings = () => {
                                   <>
                                     <button
                                       onClick={() => handleEditUser(userItem)}
-                                      className="text-blue-600 hover:text-blue-900 mr-4"
+                                      className="text-blue-600 hover:text-blue-900 hover:cursor-pointer mr-4"
                                     >
                                       Modifier
                                     </button>
                                     <button
                                       onClick={() => handleDeleteUser(userItem)}
-                                      className="text-red-600 hover:text-red-900"
+                                      className="text-red-600 hover:text-red-900 hover:cursor-pointer"
                                     >
                                       Supprimer
                                     </button>
