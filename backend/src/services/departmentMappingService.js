@@ -33,10 +33,21 @@ function loadDepartmentsCoordinates() {
   return JSON.parse(data);
 }
 
-async function getRiskDataByDepartments() {
+async function getRiskDataByDepartments(bankId = null) {
   try {
     // Récupérer toutes les entreprises avec leurs prêts et scores de risque
+    const whereClause = {
+      loans: {
+        some: {} // Seulement les entreprises qui ont au moins un prêt
+      }
+    };
+    
+    if (bankId) {
+      whereClause.bankId = bankId;
+    }
+    
     const companies = await prisma.company.findMany({
+      where: whereClause,
       include: {
         loans: {
           include: {
@@ -56,10 +67,16 @@ async function getRiskDataByDepartments() {
 
     // Traiter chaque entreprise
     companies.forEach((company) => {
-      if (!company.zipCode) return;
+      if (!company.zipCode || !company.loans || company.loans.length === 0) return;
 
       const departmentCode = getDepartmentFromZipCode(company.zipCode);
       if (!departmentCode || !departmentsCoordinates[departmentCode]) return;
+
+      // Vérifier que l'entreprise a au moins un prêt avec un score de risque
+      const hasRiskScores = company.loans.some(loan => 
+        loan.riskScores && loan.riskScores.length > 0
+      );
+      if (!hasRiskScores) return;
 
       // Initialiser le département s'il n'existe pas
       if (!departmentRisks[departmentCode]) {
@@ -79,9 +96,8 @@ async function getRiskDataByDepartments() {
 
       // Calculer le risque moyen des prêts de cette entreprise
       company.loans.forEach((loan) => {
-        departmentRisks[departmentCode].loansCount++;
-
         if (loan.riskScores && loan.riskScores.length > 0) {
+          departmentRisks[departmentCode].loansCount++;
           departmentRisks[departmentCode].totalRiskScore +=
             loan.riskScores[0].score;
         }
@@ -111,9 +127,20 @@ async function getRiskDataByDepartments() {
   }
 }
 
-async function getCompaniesWithRiskData() {
+async function getCompaniesWithRiskData(bankId = null) {
     try {
+        const whereClause = {
+            loans: {
+                some: {} // Seulement les entreprises qui ont au moins un prêt
+            }
+        };
+        
+        if (bankId) {
+            whereClause.bankId = bankId;
+        }
+        
         const companies = await prisma.company.findMany({
+            where: whereClause,
             include: {
                 loans: {
                     include: {
@@ -132,7 +159,8 @@ async function getCompaniesWithRiskData() {
         const departmentsCoords = loadDepartmentsCoordinates();
         
         companies.forEach(company => {
-            if (!company.zipCode) return;
+            // Vérifications strictes pour éviter les incohérences
+            if (!company.zipCode || !company.loans || company.loans.length === 0) return;
             
             const departmentCode = getDepartmentFromZipCode(company.zipCode);
             if (!departmentCode) return;
@@ -141,9 +169,9 @@ async function getCompaniesWithRiskData() {
             const deptCoords = departmentsCoords[departmentCode];
             if (!deptCoords) return;
 
-            // Ajouter une petite variation aléatoire pour éviter la superposition
-            const latVariation = (Math.random() - 0.5) * 0.2; // ±0.1 degré
-            const lngVariation = (Math.random() - 0.5) * 0.2; // ±0.1 degré
+            // Ajouter une petite variation aléatoire PLUS PETITE pour éviter la superposition
+            const latVariation = (Math.random() - 0.5) * 0.05; // ±0.025 degré (réduit)
+            const lngVariation = (Math.random() - 0.5) * 0.05; // ±0.025 degré (réduit)
 
             // Calculer le score moyen de l'entreprise
             let totalRiskScore = 0;
@@ -156,7 +184,10 @@ async function getCompaniesWithRiskData() {
                 }
             });
 
-            const averageRiskScore = riskCount > 0 ? totalRiskScore / riskCount : 0;
+            // Ne pas ajouter l'entreprise si aucun prêt n'a de score de risque
+            if (riskCount === 0) return;
+
+            const averageRiskScore = totalRiskScore / riskCount;
 
             result.push({
                 id: company.id,

@@ -1,9 +1,17 @@
+const { PrismaClient } = require('../../generated/prisma');
 const { getRiskDataByDepartments, getCompaniesWithRiskData } = require('../services/departmentMappingService');
 
+const prisma = new PrismaClient();
 // Récupérer les données de risque par département pour la carte
 const getRiskMapData = async (req, res) => {
     try {        
-        const riskData = await getRiskDataByDepartments();
+         // Récupérer l'ID de la banque de l'utilisateur
+        const userBank = await prisma.userBank.findFirst({
+            where: { userId: req.user.id }
+        });
+        
+        const bankId = userBank ? userBank.bankId : null;
+        const riskData = await getRiskDataByDepartments(bankId);
                 
         res.status(200).json({
             success: true,
@@ -23,9 +31,13 @@ const getRiskMapData = async (req, res) => {
 
 const getCompaniesMapData = async (req, res) => {
     try {
-        const companiesData = await getCompaniesWithRiskData();
+        // Récupérer l'ID de la banque de l'utilisateur
+        const userBank = await prisma.userBank.findFirst({
+            where: { userId: req.user.id }
+        });
         
-        console.log(`Données récupérées pour ${companiesData.length} entreprises`);
+        const bankId = userBank ? userBank.bankId : null;
+        const companiesData = await getCompaniesWithRiskData(bankId);
         
         res.status(200).json({
             success: true,

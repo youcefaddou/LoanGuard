@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, GeoJSON, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import departementsGeoJson from "../data/departements-geojson.json";
+import useAuth from '../hooks/useAuth';
 
 // Icône personnalisée pour les marqueurs d'entreprises selon le risque
 const createCompanyIcon = (riskScore) => {
@@ -119,42 +120,69 @@ const RiskMap = () => {
     });
   };
 
-  // Chargement des données
+  // Chargement initial du GeoJSON
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-
-        // Charger le GeoJSON des départements (importé directement)
-        setGeoJsonData(departementsGeoJson);
-
-        // Charger les données de risque par département
-        const riskResponse = await fetch("/api/map/risk-departements", {
-          credentials: "include",
-        });
-        const riskData = await riskResponse.json();
-        // Extraire le tableau data de la réponse
-        setDepartmentData(riskData.data || []);
-
-        // Charger les données des entreprises
-        const companiesResponse = await fetch("/api/map/companies", {
-          credentials: "include",
-        });
-        const companiesData = await companiesResponse.json();
-        // Extraire le tableau data de la réponse
-        setCompaniesData(companiesData.data || []);
-
-      } catch (err) {
-        setError("Erreur lors du chargement des données");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
+    setGeoJsonData(departementsGeoJson);
   }, []);
 
+  const { user } = useAuth();
+
+  // Fonction pour récupérer les données de risque par département avec authentification
+  const fetchDepartmentRisks = async () => {
+    try {
+      const response = await fetch('/api/map/risk-data', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const result = await response.json();
+      if (result.success) {
+        setDepartmentData(result.data);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération des risques:', error);
+    }
+  };
+
+  // Fonction pour récupérer les données des entreprises avec authentification
+  const fetchCompanies = async () => {
+    try {
+      const response = await fetch('/api/map/companies-data', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const result = await response.json();
+      if (result.success) {
+        setCompaniesData(result.data);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération des entreprises:', error);
+    }
+  };
+
+  // useEffect pour charger les données avec authentification
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (user) {
+        try {
+          setLoading(true);
+          setError(null);
+          await Promise.all([
+            fetchDepartmentRisks(),
+            fetchCompanies()
+          ]);
+        } catch (err) {
+          setError("Erreur lors du chargement des données");
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    
+    loadUserData();
+  }, [user]);
   // Fonction pour filtrer le GeoJSON et n'afficher que les départements avec des entreprises
   const getFilteredGeoJsonData = () => {
     if (!geoJsonData || !Array.isArray(departmentData)) return null;
