@@ -129,12 +129,21 @@ async function getCompaniesWithRiskData() {
         });
 
         const result = [];
+        const departmentsCoords = loadDepartmentsCoordinates();
         
         companies.forEach(company => {
             if (!company.zipCode) return;
             
             const departmentCode = getDepartmentFromZipCode(company.zipCode);
             if (!departmentCode) return;
+
+            // Récupérer les coordonnées du département
+            const deptCoords = departmentsCoords[departmentCode];
+            if (!deptCoords) return;
+
+            // Ajouter une petite variation aléatoire pour éviter la superposition
+            const latVariation = (Math.random() - 0.5) * 0.2; // ±0.1 degré
+            const lngVariation = (Math.random() - 0.5) * 0.2; // ±0.1 degré
 
             // Calculer le score moyen de l'entreprise
             let totalRiskScore = 0;
@@ -156,6 +165,9 @@ async function getCompaniesWithRiskData() {
                 zipCode: company.zipCode,
                 city: company.city,
                 departmentCode: departmentCode,
+                // Ajouter les coordonnées du département avec variation
+                latitude: deptCoords.lat + latVariation,
+                longitude: deptCoords.lng + lngVariation,
                 averageRiskScore: averageRiskScore,
                 loansCount: company.loans.length,
                 loans: company.loans.map(loan => ({
