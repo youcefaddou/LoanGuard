@@ -89,3 +89,4 @@ npm run dev
 npm install react-router-dom
 npm install @heroicons/react
 npm install chart.js react-chartjs-2
+npm install react-leaflet leaflet

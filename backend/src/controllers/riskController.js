@@ -48,11 +48,11 @@ exports.updateAllRiskScores = async (req, res) => {
 exports.getRiskEvolution = async (req, res) => {
   try {
     // Récupérer l'ID de la banque depuis le header
-    const bankId = req.headers['x-bank-id'];
-    
+    const bankId = req.headers["x-bank-id"];
+
     if (!bankId) {
       return res.status(400).json({
-        message: "ID de banque manquant"
+        message: "ID de banque manquant",
       });
     }
 
@@ -66,8 +66,8 @@ exports.getRiskEvolution = async (req, res) => {
           gte: sevenMonthsAgo,
         },
         loan: {
-          bankId: parseInt(bankId) // filtrer par banque
-        }
+          bankId: parseInt(bankId), // filtrer par banque
+        },
       },
       include: {
         loan: {
@@ -76,96 +76,98 @@ exports.getRiskEvolution = async (req, res) => {
           },
         },
       },
-      orderBy: { date: "asc"}
+      orderBy: { date: "asc" },
     });
     //grouper les scores par mois
-    const monthlyData = {}
-    const sectorData = {}
+    const monthlyData = {};
+    const sectorData = {};
 
-    riskScores.forEach(score => {
-        const month = new Date(score.date).toLocaleDateString('fr-FR', {
-            month: 'short',
-            year: '2-digit'
-        })
-        if (!monthlyData[month]) {
-            monthlyData[month] = { scores: [], count: 0}
-        }
-        monthlyData[month].scores.push(score.score)
-        monthlyData[month].count++
-        //données sectorielles 
-        const sector = score.loan.company.sector || 'Autres'
-        if (!sectorData[month]) {
-            sectorData[month] = {}
-        }
-        if (!sectorData[month][sector]) {
-            sectorData[month][sector] = { scores: [], count: 0 }
-        }
-        sectorData[month][sector].scores.push(score.score)
-        sectorData[month][sector].count++
-    })
+    riskScores.forEach((score) => {
+      const month = new Date(score.date).toLocaleDateString("fr-FR", {
+        month: "short",
+        year: "2-digit",
+      });
+      if (!monthlyData[month]) {
+        monthlyData[month] = { scores: [], count: 0 };
+      }
+      monthlyData[month].scores.push(score.score);
+      monthlyData[month].count++;
+      //données sectorielles
+      const sector = score.loan.company.sector || "Autres";
+      if (!sectorData[month]) {
+        sectorData[month] = {};
+      }
+      if (!sectorData[month][sector]) {
+        sectorData[month][sector] = { scores: [], count: 0 };
+      }
+      sectorData[month][sector].scores.push(score.score);
+      sectorData[month][sector].count++;
+    });
     //calculer les moyennes mensuelles
-    const months = []
-    const averageScores = []
-    const sectorTrend = []
-    Object.keys(monthlyData).forEach(month => {
-        months.push(month)
-        //moyenne générale
-        const monthScores = monthlyData[month].scores
-        const average = monthScores.reduce((a, b) => a + b, 0) / monthScores.length
-        averageScores.push(Number(average.toFixed(1)))
-        
-        //moyenne sectorielle (secteur Agriculture)
-        let sectorAverage = average // Par défaut, même que la moyenne générale
-        if (sectorData[month]['Agriculture']) {
-            const sectorScores = sectorData[month]['Agriculture'].scores
-            sectorAverage = sectorScores.reduce((a, b) => a + b, 0) / sectorScores.length
-        }
-        sectorTrend.push(Number(sectorAverage.toFixed(1)))
-    })
+    const months = [];
+    const averageScores = [];
+    const sectorTrend = [];
+    for (const month in monthlyData) {
+      months.push(month);
+      //moyenne générale
+      const monthScores = monthlyData[month].scores;
+      const average =
+        monthScores.reduce((a, b) => a + b, 0) / monthScores.length;
+      averageScores.push(Number(average.toFixed(1)));
+
+      //moyenne sectorielle (secteur Agriculture)
+      let sectorAverage = average; // Par défaut, même que la moyenne générale
+      if (sectorData[month]["Agriculture"]) {
+        const sectorScores = sectorData[month]["Agriculture"].scores;
+        sectorAverage =
+          sectorScores.reduce((a, b) => a + b, 0) / sectorScores.length;
+      }
+      sectorTrend.push(Number(sectorAverage.toFixed(1)));
+    }
 
     res.json({
-        message: "Évolution récupérée avec succès",
-        data: {
-            months,
-            averageScores,
-            sectorTrend,
-            totalLoans: riskScores.length
-        }
-    })
-
+      message: "Évolution récupérée avec succès",
+      data: {
+        months,
+        averageScores,
+        sectorTrend,
+        totalLoans: riskScores.length,
+      },
+    });
   } catch (error) {
-    console.error("Erreur récupération évolution:", error)
+    console.error("Erreur récupération évolution:", error);
     res.status(500).json({
-        message: "Erreur lors de la récupération de l'évolution"
-    })
+      message: "Erreur lors de la récupération de l'évolution",
+    });
   }
 };
 exports.trainModel = async (req, res) => {
   try {
     // Générer les données d'entraînement depuis vos prêts
     const trainingData = await aiTrainingService.generateTrainingData();
-    
+
     if (trainingData.length < 5) {
       return res.status(400).json({
-        message: "Pas assez de données pour entraîner le modèle (minimum 5 prêts)"
+        message:
+          "Pas assez de données pour entraîner le modèle (minimum 5 prêts)",
       });
     }
-    
+
     // Entraîner le modèle
     const model = await riskPredictionModel.trainModel();
-    
+
     // Sauvegarder le modèle
     // await riskPredictionModel.saveModel(model);
-    
+
     res.json({
-      message: "Modèle entraîné avec succès (sauvegarde temporairement désactivée)",
-      dataPoints: trainingData.length
+      message:
+        "Modèle entraîné avec succès (sauvegarde temporairement désactivée)",
+      dataPoints: trainingData.length,
     });
-    
   } catch (error) {
     console.error("Erreur entraînement modèle:", error);
     res.status(500).json({
-      message: "Erreur lors de l'entraînement du modèle"
+      message: "Erreur lors de l'entraînement du modèle",
     });
   }
 };

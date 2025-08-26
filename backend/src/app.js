@@ -57,6 +57,7 @@ app.use('/api/risk', require('./routes/riskRoute'))
 
 app.use('/api/simulation', require('./routes/simulationRoute'))
 app.use('/api/alerts', require('./routes/alertRoute'))
+app.use('/api/map', require('./routes/mapRoute'))
 
 // Gestion des routes non trouvées
 app.use('*', (req, res) => {
