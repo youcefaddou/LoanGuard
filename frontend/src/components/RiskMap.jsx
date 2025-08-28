@@ -312,6 +312,7 @@ const RiskMap = () => {
         isFullscreen ? "h-full w-full" : "h-64 md:h-80 lg:h-96 w-full"
       } ${isFullscreen ? "" : "rounded-lg"}`}
       style={isFullscreen ? fullscreenMapStyle : {}}
+      zoomControl={true} // Contrôles de zoom toujours activés
       key={isFullscreen ? "fullscreen" : "normal"} // Key différente pour forcer le remount
     >
       <MapContent />
@@ -388,8 +389,8 @@ const RiskMap = () => {
           </div>
         </div>
 
-        {/* Carte normale */}
-        <MapComponent />
+        {/* Carte normale - cachée quand la modal est ouverte */}
+        {!isModalOpen && <MapComponent />}
       </div>
 
       {/* Modal plein écran */}
