@@ -5,15 +5,23 @@ import "leaflet/dist/leaflet.css";
 import departementsGeoJson from "../data/departements-geojson.json";
 import useAuth from '../hooks/useAuth';
 
+// Style CSS pour la carte plein écran
+const fullscreenMapStyle = {
+  height: '100vh',
+  width: '100vw',
+  minHeight: '100vh',
+  maxHeight: '100vh'
+};
+
 // Icône personnalisée pour les marqueurs d'entreprises selon le risque
 const createCompanyIcon = (riskScore) => {
   let color = "#9ca3af"; // gris par défaut (pas de risque)
 
-  if (riskScore >= 0 && riskScore < 4) {
+  if (riskScore >= 0 && riskScore < 6) {
     color = "#22c55e"; // vert (risque faible)
-  } else if (riskScore >= 4 && riskScore < 7) {
+  } else if (riskScore >= 6 && riskScore < 8) {
     color = "#f59e0b"; // orange (risque moyen)
-  } else if (riskScore >= 7) {
+  } else if (riskScore >= 8) {
     color = "#ef4444"; // rouge (risque élevé)
   }
 
@@ -42,9 +50,9 @@ const RiskMap = () => {
   const [error, setError] = useState(null);
 
   const getRiskColor = (riskLevel) => {
-    if (riskLevel >= 0 && riskLevel < 5) return "#22c55e"; // vert
-    if (riskLevel >= 5 && riskLevel <= 7) return "#f59e0b"; // orange
-    if (riskLevel > 7) return "#ef4444"; // rouge
+    if (riskLevel >= 0 && riskLevel < 6) return "#22c55e"; // vert
+    if (riskLevel >= 6 && riskLevel < 8) return "#f59e0b"; // orange
+    if (riskLevel >= 8) return "#ef4444"; // rouge
     return "#9ca3af"; // gris par défaut
   };
 
@@ -204,10 +212,13 @@ const RiskMap = () => {
       }
     }
 
-    return {
-      ...geoJsonData,
-      features: filteredFeatures,
+    // Créer un nouvel objet avec les features filtrées
+    const filteredGeoJsonData = {
+      type: geoJsonData.type,
+      features: filteredFeatures
     };
+    
+    return filteredGeoJsonData;
   };
 
   const MapContent = () => {
@@ -251,9 +262,9 @@ const RiskMap = () => {
                     </span>
                     <span
                       className={`text-sm font-bold ${
-                        company.averageRiskScore >= 7
+                        company.averageRiskScore >= 8
                           ? "text-red-600"
-                          : company.averageRiskScore >= 4
+                          : company.averageRiskScore >= 6
                           ? "text-yellow-600"
                           : company.averageRiskScore > 0
                           ? "text-green-600"
@@ -299,7 +310,8 @@ const RiskMap = () => {
       zoom={isFullscreen ? 6 : 5}
       className={`${
         isFullscreen ? "h-full w-full" : "h-64 md:h-80 lg:h-96 w-full"
-      } rounded-lg`}
+      } ${isFullscreen ? "" : "rounded-lg"}`}
+      style={isFullscreen ? fullscreenMapStyle : {}}
       key={isFullscreen ? "fullscreen" : "normal"} // Key différente pour forcer le remount
     >
       <MapContent />
@@ -359,15 +371,15 @@ const RiskMap = () => {
           <div className="flex flex-wrap gap-2 text-sm">
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-green-500 rounded-full border border-white"></div>
-              <span>Risque faible (0-4)</span>
+              <span>Risque faible (0-6)</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-yellow-500 rounded-full border border-white"></div>
-              <span>Risque moyen (4-7)</span>
+              <span>Risque moyen (6-8)</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-red-500 rounded-full border border-white"></div>
-              <span>Risque élevé (7+)</span>
+              <span>Risque élevé (8+)</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-gray-400 rounded-full border border-white"></div>
@@ -382,9 +394,9 @@ const RiskMap = () => {
 
       {/* Modal plein écran */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg w-full h-full max-w-7xl max-h-full flex flex-col">
-            <div className="flex justify-between items-center p-4 border-b">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50" style={{ height: '100vh', width: '100vw' }}>
+          <div className="bg-white w-full h-full flex flex-col" style={{ height: '100vh' }}>
+            <div className="flex justify-between items-center p-4 border-b flex-shrink-0">
               <h2 className="text-xl font-bold">
                 Carte des Risques - Vue étendue
               </h2>
@@ -407,7 +419,7 @@ const RiskMap = () => {
                 </svg>
               </button>
             </div>
-            <div className="flex-1 p-4">
+            <div className="flex-1 overflow-hidden" style={{ height: 'calc(100vh - 80px)' }}>
               <MapComponent isFullscreen={true} />
             </div>
           </div>
