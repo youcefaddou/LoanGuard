@@ -115,7 +115,7 @@
 }
 
 .demo-cta {
-  background: #3b82f6;
+  background: #2401ae;
   color: white;
   border: none;
   padding: 14px 32px;
@@ -126,7 +126,7 @@
 }
 
 .demo-cta:hover {
-  background: #2563eb;
+  background: #1d51c1;
 }
 
 .demo-visual {
@@ -235,7 +235,7 @@
 }
 
 .demo-tab.active {
-  background: linear-gradient(135deg, #1e40af, #7c3aed);
+  background: linear-gradient(135deg, #1e40af, #2401ae);
   color: white;
   border-color: transparent;
   box-shadow: 0 8px 25px -5px rgba(30, 64, 175, 0.3);
@@ -262,6 +262,7 @@
 .demo-panel.active {
   display: grid;
   animation: fadeInUp 0.6s ease-out;
+  margin-left: 20px ;
 }
 
 @keyframes fadeInUp {
@@ -318,7 +319,7 @@
 }
 
 .demo-cta {
-  background: linear-gradient(135deg, #1e40af, #7c3aed);
+  background: linear-gradient(135deg, #1e40af, #2401ae);
   color: white;
   border: none;
   padding: 14px 32px;
@@ -383,6 +384,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 30px;
+  margin-left: 20px;
   position: relative;
   z-index: 1;
 }

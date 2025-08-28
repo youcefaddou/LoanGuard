@@ -12,10 +12,10 @@ export default function Header() {
           {/* Logo - exactement comme votre maquette */}
           <div className="flex items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-800 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">LG</span>
               </div>
-              <h1 className="text-2xl font-bold text-blue-600">
+              <h1 className="text-2xl font-bold text-blue-800">
                 LoanGuard
               </h1>
             </div>
@@ -41,7 +41,7 @@ export default function Header() {
           <div className="hidden md:flex items-center">
             <Link
               href="/app"
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="bg-blue-800 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
               Connexion
             </Link>

@@ -19,7 +19,7 @@ export default function Hero() {
             <div className="pt-4">
               <Link
                 href="#contact"
-                className="inline-block bg-gradient-to-r from-emerald-500 to-blue-600 text-white px-8 py-4 rounded-lg font-medium text-lg hover:opacity-90 transition-opacity"
+                className="inline-block bg-gradient-to-r from-emerald-700 to-blue-700 text-white px-8 py-4 rounded-lg font-medium text-lg hover:opacity-90 transition-opacity"
               >
                 Contactez-nous
               </Link>
@@ -33,8 +33,8 @@ export default function Hero() {
               <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-blue-600 font-medium">Prédictions IA</span>
-                    <span className="text-emerald-500 font-medium">Données réelles</span>
+                    <span className="text-blue-800 font-medium">Prédictions IA</span>
+                    <span className="text-emerald-700 font-medium">Données réelles</span>
                   </div>
                   
                   {/* Simulation du graphique */}
