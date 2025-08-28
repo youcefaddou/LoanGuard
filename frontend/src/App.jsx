@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import SelectBank from './pages/SelectBank';
@@ -11,20 +11,17 @@ import Settings from './pages/Settings';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/select-bank" element={<SelectBank />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/loans" element={<Loans />} />
-        <Route path="/companies" element={<Companies />} />
-        <Route path="/loans/:id" element={<LoanDetail />} />
-        <Route path="/simulator" element={<Simulator />} />
-        <Route path="/alerts" element={<Alerts />} />
-        <Route path="/settings" element={<Settings />} />
-        
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/select-bank" element={<SelectBank />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/loans" element={<Loans />} />
+      <Route path="/companies" element={<Companies />} />
+      <Route path="/loans/:id" element={<LoanDetail />} />
+      <Route path="/simulator" element={<Simulator />} />
+      <Route path="/alerts" element={<Alerts />} />
+      <Route path="/settings" element={<Settings />} />
+    </Routes>
   );
 }
 
