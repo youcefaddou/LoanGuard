@@ -4,6 +4,7 @@ import alertService from "../services/alertService";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
+import { formatDateTime } from '../utils/formatters';
 
 const Alerts = () => {
   const navigate = useNavigate();
@@ -113,16 +114,7 @@ const Alerts = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+
 
   const filteredAlerts = alerts.filter((alert) => {
     if (filter === "all") return true;
@@ -279,7 +271,7 @@ const Alerts = () => {
                               {alert.message}
                             </p>
                             <p className="text-xs text-gray-500">
-                              {formatDate(alert.date)}
+                              {formatDateTime(alert.date)}
                             </p>
                           </div>
                           {alert.loan && alert.loan.company && (

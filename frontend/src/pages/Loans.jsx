@@ -56,7 +56,7 @@ const Loans = () => {
           {/* Contenu des prêts */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-screen">
             <div className="p-4">
-              <h2 className="text-xl font-semibold text-gray-800">Liste des Prêts</h2>
+              <h1 className="text-xl font-semibold text-gray-800">Liste des Prêts</h1>
             </div>
             <div className="p-4">
               {loans.length === 0 ? (

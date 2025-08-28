@@ -71,9 +71,9 @@ const Companies = () => {
           {/* Contenu des entreprises */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-full">
             <div className="p-4">
-              <h2 className="text-xl font-semibold text-gray-800">
+              <h1 className="text-xl font-semibold text-gray-800">
                 Entreprises clientes
-              </h2>
+              </h1>
               <p className="text-sm text-gray-600 mt-1">
                 Liste des entreprises de votre portefeuille
               </p>
