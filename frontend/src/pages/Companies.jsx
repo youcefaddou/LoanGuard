@@ -105,7 +105,7 @@ const Companies = () => {
                   <select
                     value={selectedSector}
                     onChange={(e) => setSelectedSector(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm hover:cursor-pointer"
                   >
                     <option value="">Tous les secteurs</option>
                     {uniqueSectors.map(sector => (
@@ -156,7 +156,7 @@ const Companies = () => {
                   Aucune entreprise trouvée avec ces critères.
                 </div>
               ) : (
-                <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-gray-200 ">
                   {filteredCompanies.map((company) => (
                     <div key={company.id} className="p-4 hover:bg-gray-50">
                       {/* Ligne 1: Nom + Statut sur mobile, nom + statut + date sur desktop */}
@@ -194,10 +194,12 @@ const Companies = () => {
                           <span className="font-medium text-gray-700 mr-1">Secteur:</span>
                           <span>{company.sector ? getSectorDescription(company.sector) : 'Pas de secteur'}</span>
                         </div>
-                        <div className="flex items-center sm:col-span-2 lg:col-span-1">
-                          <MapPinIcon className="h-3 w-3 text-gray-400 mr-1 flex-shrink-0" />
-                          <span className="truncate">
-                            {company.address}, {company.postalCode} {company.city}
+                        <div className="flex items-start sm:col-span-2 lg:col-span-1">
+                          <MapPinIcon className="h-3 w-3 text-gray-400 mr-1 flex-shrink-0 mt-1.5" />
+                          <span className="text-sm leading-relaxed">
+                            {company.address}
+                            {company.zipCode && `, ${company.zipCode}`}
+                            {company.city && ` ${company.city}`}
                           </span>
                         </div>
                       </div>

@@ -347,7 +347,7 @@ const RiskMap = () => {
           </h2>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors"
+            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg hover:cursor-pointer transition-colors"
           >
             <svg
               className="w-4 h-4"
@@ -362,7 +362,7 @@ const RiskMap = () => {
                 d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
               />
             </svg>
-            <span className="hidden sm:inline">Agrandir</span>
+            <span className="hidden sm:inline ">Agrandir</span>
           </button>
         </div>
 
@@ -403,7 +403,7 @@ const RiskMap = () => {
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-500 hover:text-gray-700 p-2"
+                className="text-gray-500 hover:text-red-700 p-2 hover:cursor-pointer"
               >
                 <svg
                   className="w-6 h-6"

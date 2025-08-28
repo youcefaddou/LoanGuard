@@ -157,7 +157,7 @@ const Alerts = () => {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setFilter("all")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-md text-sm font-medium hover:cursor-pointer transition-colors ${
                     filter === "all"
                       ? "bg-blue-600 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -167,7 +167,7 @@ const Alerts = () => {
                 </button>
                 <button
                   onClick={() => setFilter("warning")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-md text-sm font-medium hover:cursor-pointer transition-colors ${
                     filter === "warning"
                       ? "bg-yellow-500 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -177,7 +177,7 @@ const Alerts = () => {
                 </button>
                 <button
                   onClick={() => setFilter("info")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-md text-sm font-medium hover:cursor-pointer transition-colors ${
                     filter === "info"
                       ? "bg-blue-500 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -187,7 +187,7 @@ const Alerts = () => {
                 </button>
                 <button
                   onClick={() => setFilter("success")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-md text-sm font-medium hover:cursor-pointer transition-colors ${
                     filter === "success"
                       ? "bg-green-500 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
