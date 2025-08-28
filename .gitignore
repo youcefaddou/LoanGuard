@@ -10,7 +10,9 @@ back/.env
 front/.env
 # Prisma
 back/prisma/dev.db
-
-
+dist/
+dist_app/
 
 copilot-instructions.md
+frontend-dist-app.tar.gz
+landing-out.tar.gz
