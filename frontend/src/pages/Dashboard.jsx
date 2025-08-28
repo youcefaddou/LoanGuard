@@ -12,7 +12,7 @@ const Dashboard = () => {
       <Sidebar />
 
       {/* Contenu principal */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen ">
         <Header />
         <main className="flex-1 p-2 sm:p-3 lg:p-2">
           {/* Grid 2x2 pour les 4 containers */}

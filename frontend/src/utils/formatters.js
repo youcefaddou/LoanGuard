@@ -3,11 +3,11 @@ export const formatAmount = (amount) => {
   if (!amount) return "0€";
 
   if (amount >= 1000000) {
-    return `€${(amount / 1000000).toFixed(1)}M`;
+    return `${(amount / 1000000).toFixed(1)}M€`;
   } else if (amount >= 1000) {
-    return `€${(amount / 1000).toFixed(0)}K`;
+    return `${(amount / 1000).toFixed(0)}K€`;
   } else {
-    return `€${amount.toLocaleString()}`;
+    return `${amount.toLocaleString()}€`;
   }
 };
 
@@ -23,7 +23,7 @@ export const formatAmountCompact = (amount) => {
 
 // Formatage des montants exacts (sans centimes)
 export const formatExactAmount = (amount) => {
-  if (!amount) return "€0";
+  if (!amount) return "0€";
   return `€${Math.round(amount).toLocaleString()}`;
 };
 

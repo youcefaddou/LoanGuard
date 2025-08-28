@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
 import loanService from "../services/loanService";
 import { useNavigate } from "react-router-dom";
+import { formatAmount, formatDate } from "../utils/formatters";
 
 const LoanWatchlist = () => {
   const [watchlistLoans, setWatchlistLoans] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Fonction pour naviguer vers le détail du prêt
+  const handleLoanClick = (loanId) => {
+    navigate(`/loans/${loanId}`);
+  };
 
   useEffect(() => {
     const fetchWatchlist = async () => {
@@ -18,7 +24,7 @@ const LoanWatchlist = () => {
         }
       } catch (error) {
         console.error("Erreur lors de la récupération de la watchlist:", error);
-        // En cas d'erreur, vous pouvez garder une liste vide ou des données simulées
+        // En cas d'erreur, on peut garder une liste vide ou des données simulées
       } finally {
         setLoading(false);
       }
@@ -41,41 +47,6 @@ const LoanWatchlist = () => {
     return "Faible";
   };
 
-  // Formater le montant
-  const formatAmount = (amount) => {
-    if (amount >= 1000000) {
-      return `€${(amount / 1000000).toFixed(1)}M`;
-    }
-    if (amount >= 1000) {
-      return `€${(amount / 1000).toFixed(0)}K`;
-    }
-    return `€${amount}`;
-  };
-
-  // Formater la date
-  const formatDate = (dateString) => {
-    if (!dateString) {
-      return "Non définie";
-    }
-    
-    try {
-      const date = new Date(dateString);
-      // Vérifier si la date est valide
-      if (isNaN(date.getTime())) {
-        return "Date invalide";
-      }
-      
-      return date.toLocaleDateString("fr-FR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      });
-    } catch (error) {
-      console.error("Erreur lors du formatage de la date:", error);
-      return "Erreur date";
-    }
-  };
-
   if (loading) {
     return (
       <div className="p-6">
@@ -91,11 +62,13 @@ const LoanWatchlist = () => {
           </a>
         </div>
         <div className="space-y-4">
-          {Array(5).fill(0).map((item, index) => (
-            <div key={index} className="animate-pulse">
-              <div className="h-16 bg-gray-200 rounded"></div>
-            </div>
-          ))}
+          {Array(5)
+            .fill(0)
+            .map((item, index) => (
+              <div key={index} className="animate-pulse">
+                <div className="h-16 bg-gray-200 rounded"></div>
+              </div>
+            ))}
         </div>
       </div>
     );
@@ -109,7 +82,7 @@ const LoanWatchlist = () => {
         </h3>
         <button
           onClick={() => navigate("/loans")}
-          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+          className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:cursor-pointer hover:scale-105 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
         >
           Voir tout →
         </button>
@@ -120,10 +93,11 @@ const LoanWatchlist = () => {
           watchlistLoans.map((loan) => (
             <div
               key={loan.id}
-              className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
+              className="flex items-center justify-between py-3 px-2 border-b border-gray-100 last:border-b-0 hover:bg-blue-50 hover:scale-105 transform transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] cursor-pointer"
+              onClick={() => handleLoanClick(loan.id)}
             >
               <div className="flex-1">
-                <h4 className="font-medium text-gray-900">
+                <h4 className="font-medium text-gray-900 hover:text-blue-600 transition-colors">
                   {loan.companyName}
                 </h4>
                 <p className="text-sm text-gray-500">

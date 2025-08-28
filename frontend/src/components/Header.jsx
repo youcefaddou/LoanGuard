@@ -79,6 +79,7 @@ const Header = ({ onAddLoan }) => {
       return () => document.removeEventListener("click", handleClickOutside);
     }
   }, [isBankMenuOpen, isLogoutMenuOpen, isMobileMenuOpen]);
+
   //déterminer le type de header selon la page
   const isHomepage = location.pathname === "/";
   const isAuthPage =
@@ -92,6 +93,7 @@ const Header = ({ onAddLoan }) => {
     // Recharger la page pour mettre à jour les données
     window.location.reload();
   };
+
   // fonction de déconnexion sécurisée
   const handleLogout = async () => {
     await authService.logout();
@@ -175,7 +177,7 @@ const Header = ({ onAddLoan }) => {
                       // Déclencher l'événement pour la Sidebar
                       window.dispatchEvent(new CustomEvent("toggleMobileMenu"));
                     }}
-                    className="md:hidden p-2 text-gray-600 hover:text-gray-900"
+                    className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
                   >
                     {isMobileMenuOpen ? (
                       <XMarkIcon className="h-6 w-6" />
@@ -233,14 +235,14 @@ const Header = ({ onAddLoan }) => {
             <div className="flex justify-between items-center h-16">
               {/* Titre de page OU Sélecteur d'agence */}
               <div className="flex items-center space-x-4">
-                {/* Menu burger */}
+                {/* Menu burger - caché sur lg+ */}
                 <button
                   onClick={() => {
                     setIsMobileMenuOpen(!isMobileMenuOpen);
                     // Déclencher l'événement pour la Sidebar
                     window.dispatchEvent(new CustomEvent("toggleMobileMenu"));
                   }}
-                  className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
+                  className="lg:hidden p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
                 >
                   {isMobileMenuOpen ? (
                     <XMarkIcon className="h-6 w-6" />
