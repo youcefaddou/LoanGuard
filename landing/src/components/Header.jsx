@@ -23,16 +23,16 @@ export default function Header() {
 
           {/* Navigation Desktop - style minimaliste */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="#accueil" className="text-blue-600 font-medium">
+            <Link href="#home" className="text-blue-600 font-medium">
               Accueil
             </Link>
-            <Link href="#fonctionnalites" className="text-gray-600 hover:text-blue-600 transition-colors">
+            <Link href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">
               Fonctionnalités
             </Link>
-            <Link href="#securite" className="text-gray-600 hover:text-blue-600 transition-colors">
+            <Link href="#security" className="text-gray-600 hover:text-blue-600 transition-colors">
               Sécurité
             </Link>
-            <Link href="#a-propos" className="text-gray-600 hover:text-blue-600 transition-colors">
+            <Link href="#about" className="text-gray-600 hover:text-blue-600 transition-colors">
               À propos
             </Link>
           </nav>
@@ -64,16 +64,16 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
             <nav className="flex flex-col space-y-4">
-              <Link href="#accueil" className="text-blue-600 font-medium">
+              <Link href="#home" className="text-blue-600 font-medium">
                 Accueil
               </Link>
-              <Link href="#fonctionnalites" className="text-gray-600 hover:text-blue-600 transition-colors">
+              <Link href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">
                 Fonctionnalités
               </Link>
-              <Link href="#securite" className="text-gray-600 hover:text-blue-600 transition-colors">
+              <Link href="#security" className="text-gray-600 hover:text-blue-600 transition-colors">
                 Sécurité
               </Link>
-              <Link href="#a-propos" className="text-gray-600 hover:text-blue-600 transition-colors">
+              <Link href="#about" className="text-gray-600 hover:text-blue-600 transition-colors">
                 À propos
               </Link>
               <div className="pt-4 border-t border-gray-200">
