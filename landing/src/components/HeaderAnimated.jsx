@@ -41,7 +41,7 @@ export default function HeaderAnimated() {
               <Link href="#demo" className="text-blue-800 font-semibold hover:underline">Démo</Link>
             </nav>
             <Link
-              href="http://localhost:5173/login"
+              href="/app/login"
               className="bg-blue-800 text-white px-4 py-2 rounded-md hover:cursor-pointer hover:bg-blue-600 font-semibold"
             >
               Connexion
@@ -56,7 +56,7 @@ export default function HeaderAnimated() {
           <Link href="#security" className="block py-2 text-blue-800 font-semibold hover:underline">Sécurité</Link>
           <Link href="#demo" className="block py-2 text-blue-800 font-semibold hover:underline">Démo</Link>
           <Link
-            href="http://localhost:5173/login"
+            href="/app/login"
             className="block mt-3 bg-blue-800 text-white px-4 py-2 rounded-md hover:cursor-pointer hover:bg-blue-600 text-center font-semibold"
           >
             Connexion
