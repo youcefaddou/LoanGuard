@@ -138,7 +138,7 @@ const RiskMap = () => {
   // Fonction pour récupérer les données de risque par département avec authentification
   const fetchDepartmentRisks = async () => {
     try {
-      const response = await fetch('/api/map/risk-data', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/map/risk-data`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -155,7 +155,7 @@ const RiskMap = () => {
   // Fonction pour récupérer les données des entreprises avec authentification
   const fetchCompanies = async () => {
     try {
-      const response = await fetch('/api/map/companies-data', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/map/companies-data`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
