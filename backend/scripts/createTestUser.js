@@ -7,8 +7,9 @@ async function createTestUser() {
   try {
     console.log('Création des utilisateurs de test...');
     
-    // Mot de passe commun pour tous les utilisateurs de test
-    const hashedPassword = await argon2.hash('Testpass123!');
+  // Mot de passe commun pour tous les utilisateurs de test
+  const plainPassword = 'Testpass123!';
+  const hashedPassword = await argon2.hash(plainPassword);
     
     // Vérifier si des banques existent (créées par createTestBanks)
     const banques = await prisma.bank.findMany();
@@ -97,11 +98,11 @@ async function createTestUser() {
     console.log('ADM créé:', admUser.email);
     
     console.log('\n Tous les utilisateurs de test créés avec succès !');
-    console.log('\n Comptes de test disponibles:');
-    console.log('1. RES Multi-banques: res.multi@test.com / TestUser123!');
-    console.log('2. RES Mono-banque: res.single@test.com / TestUser123!');
-    console.log('3. CHG: chg.test@test.com / TestUser123!');
-    console.log('4. ADM: admin@test.com / TestUser123!');
+  console.log('\n Comptes de test disponibles:');
+  console.log(`1. RES Multi-banques: res.multi@test.com / ${plainPassword}`);
+  console.log(`2. RES Mono-banque: res.single@test.com / ${plainPassword}`);
+  console.log(`3. CHG: chg.test@test.com / ${plainPassword}`);
+  console.log(`4. ADM: admin@test.com / ${plainPassword}`);
     
   } catch (error) {
     if (error.code === 'P2002') {
