@@ -4,6 +4,7 @@ import Footer from "../components/Footer"
 import { useState, useEffect } from "react"
 import AddLoanModal from "../components/AddLoanModal"
 import LoanItem from "../components/LoanItem"
+import authService from "../services/authService"
 
 const Loans = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -12,19 +13,7 @@ const Loans = () => {
   // Fonction pour charger les prêts depuis l'API
   const fetchLoans = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const bankId = localStorage.getItem('selectedBankId');
-      
-      const response = await fetch('http://localhost:4000/api/loans', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'x-bank-id': bankId,
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-      });
-
+      const response = await authService.secureRequest('/api/loans', { method: 'GET' });
       if (response.ok) {
         const data = await response.json();
         setLoans(data.loans || []);

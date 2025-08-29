@@ -71,28 +71,18 @@ const LoanDetail = () => {
   useEffect(() => {
     const fetchLoan = async () => {
       try {
-        const token = localStorage.getItem("token");
-
-        const response = await fetch(`http://localhost:4000/api/loans/${id}`, {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            "x-bank-id": "1",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
+        const response = await authService.secureRequest(`/api/loans/${id}`, { method: 'GET' });
 
         if (!response.ok) {
           if (response.status === 401) {
             navigate("/login");
             return;
           }
-          setError("Erreur lors du chargement du prêt");
-          return;
-        }
+    setError("Erreur lors du chargement du prêt");
+    return;
+  }
 
-        const data = await response.json();
+  const data = await response.json();
         setLoan(data);
       } catch (error) {
         console.error("Erreur fetch prêt:", error);
