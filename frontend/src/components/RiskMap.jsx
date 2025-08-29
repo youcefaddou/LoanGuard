@@ -140,7 +140,7 @@ const RiskMap = () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/map/risk-data`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         }
       });
       const result = await response.json();
@@ -157,7 +157,7 @@ const RiskMap = () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/map/companies-data`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         }
       });
       const result = await response.json();

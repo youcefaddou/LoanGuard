@@ -116,12 +116,17 @@ exports.login = async (req, res) => {
     );
 
     // Cookie httpOnly sécurisé (Protection XSS)
-    res.cookie('authToken', token, {
-      httpOnly: true,                          // Pas accessible via JavaScript
-      secure: process.env.NODE_ENV === 'production', // HTTPS en production
-      sameSite: 'strict',                      // Protection CSRF
-      maxAge: 8 * 60 * 60 * 1000              // 8 heures
-    });
+    // En production, utiliser SameSite=None pour permettre l'envoi cross-subdomain
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 8 * 60 * 60 * 1000,
+    };
+    if (process.env.COOKIE_DOMAIN) {
+      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    }
+    res.cookie('authToken', token, cookieOptions);
 
     // Logique de redirection selon le rôle
     if (user.role === 'CHG') {
@@ -295,11 +300,15 @@ exports.selectBank = async (req, res) => {
 exports.logout = async (req, res) => {
   try {
     // Suppression du cookie httpOnly sécurisé
-    res.clearCookie('authToken', {
+    const clearOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
-    });
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    };
+    if (process.env.COOKIE_DOMAIN) {
+      clearOptions.domain = process.env.COOKIE_DOMAIN;
+    }
+    res.clearCookie('authToken', clearOptions);
 
     res.json({ message: 'Déconnexion réussie'});
     
