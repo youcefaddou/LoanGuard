@@ -61,12 +61,12 @@ const LoanWatchlist = () => {
             Voir tout →
           </a>
         </div>
-        <div className="space-y-4">
-          {Array(5)
+        <div className="space-y-3">
+          {Array(6)
             .fill(0)
             .map((item, index) => (
               <div key={index} className="animate-pulse">
-                <div className="h-16 bg-gray-200 rounded"></div>
+                <div className="h-14 bg-gray-200 rounded"></div>
               </div>
             ))}
         </div>
@@ -88,12 +88,12 @@ const LoanWatchlist = () => {
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {watchlistLoans.length > 0 ? (
           watchlistLoans.map((loan) => (
             <div
               key={loan.id}
-              className="flex items-center justify-between py-3 px-2 border-b border-gray-100 last:border-b-0 hover:bg-blue-50 hover:scale-105 transform transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] cursor-pointer"
+              className="flex items-center justify-between py-2.5 px-2 border-b border-gray-100 last:border-b-0 hover:bg-blue-50 hover:scale-105 transform transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] cursor-pointer"
               onClick={() => handleLoanClick(loan.id)}
             >
               <div className="flex-1">

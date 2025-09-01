@@ -277,7 +277,7 @@ exports.getWatchlist = async (req, res) => {
         const scoreB = b.riskScores[0]?.score || 0;
         return scoreB - scoreA;
       })
-      .slice(0, 5);
+      .slice(0, 6); 
 
     //formater les données pour le front
     const formattedLoans = watchlistLoans.map((loan) => ({
