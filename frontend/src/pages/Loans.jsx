@@ -9,6 +9,8 @@ import authService from "../services/authService"
 const Loans = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [loans, setLoans] = useState([]) // pour stocker la liste des prets
+  const [filter, setFilter] = useState('') // pour la recherche par nom d'entreprise
+  const [selectedStatus, setSelectedStatus] = useState('') // pour filtrer par statut
 
   // Fonction pour charger les prêts depuis l'API
   const fetchLoans = async () => {
@@ -35,6 +37,23 @@ const Loans = () => {
     fetchLoans(); // Recharger la liste complète
   };
 
+  // Filtrer les prêts
+  const filteredLoans = loans.filter(loan => {
+    const matchesCompany = loan.companyName ? 
+      loan.companyName.toLowerCase().includes(filter.toLowerCase()) : true;
+    const matchesStatus = selectedStatus === '' || loan.status === selectedStatus;
+    return matchesCompany && matchesStatus;
+  });
+
+  // Obtenir les statuts uniques pour le filtre
+  const uniqueStatuses = [];
+  for (let i = 0; i < loans.length; i++) {
+    const status = loans[i].status;
+    if (!uniqueStatuses.includes(status)) {
+      uniqueStatuses.push(status);
+    }
+  }
+
   return (
     <div className="flex">
       <Sidebar />
@@ -44,15 +63,59 @@ const Loans = () => {
         <main className="flex-1 p-2 sm:p-3 lg:p-2">
           {/* Contenu des prêts */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-h-screen">
-            <div className="p-4">
-              <h1 className="text-xl font-semibold text-gray-800">Liste des Prêts</h1>
+            {/* Header avec titre et filtres sur la même ligne */}
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                {/* Titre */}
+                <div>
+                  <h1 className="text-xl font-semibold text-gray-800">Liste des Prêts</h1>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {filteredLoans.length} prêt{filteredLoans.length !== 1 ? 's' : ''} trouvé{filteredLoans.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+
+                {/* Filtres - Responsive */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3 lg:w-auto w-full lg:max-w-md">
+                  {/* Recherche par entreprise */}
+                  <div className="lg:w-48">
+                    <input
+                      type="text"
+                      value={filter}
+                      onChange={(e) => setFilter(e.target.value)}
+                      placeholder="Rechercher une entreprise..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+
+                  {/* Filtre par statut */}
+                  <div className="lg:w-40">
+                    <select
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm hover:cursor-pointer"
+                    >
+                      <option value="">Tous les statuts</option>
+                      {uniqueStatuses.map(status => (
+                        <option key={status} value={status}>
+                          {status === 'EN_COURS' ? 'En cours' : 
+                           status === 'TERMINE' ? 'Terminé' : 
+                           status === 'EN_RETARD' ? 'En retard' : status}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
             </div>
+
             <div className="p-4">
-              {loans.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">Aucun prêt enregistré pour le moment</p>
+              {filteredLoans.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">
+                  {loans.length === 0 ? 'Aucun prêt enregistré pour le moment' : 'Aucun prêt ne correspond à vos critères de recherche'}
+                </p>
               ) : (
                 <div className="space-y-1">
-                  {loans.map(loan => (
+                  {filteredLoans.map(loan => (
                     <LoanItem key={loan.id} loan={loan} />
                   ))}
                 </div>

@@ -88,6 +88,12 @@ const Header = ({ onAddLoan }) => {
     localStorage.setItem("selectedBank", JSON.stringify(bank));
     localStorage.setItem("selectedBankId", bank.id);
     setIsBankMenuOpen(false);
+    
+    // Déclencher un événement personnalisé pour notifier les composants
+    window.dispatchEvent(new CustomEvent('bankChanged', { 
+      detail: { bank, bankId: bank.id } 
+    }));
+    
     // Recharger la page pour mettre à jour les données
     window.location.reload();
   };

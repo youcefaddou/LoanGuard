@@ -183,6 +183,39 @@ const RiskMap = () => {
     };
     
     loadUserData();
+  }, [user]); // Dépend de user ET de la banque sélectionnée
+
+  // Écouter les changements de banque (changement dans localStorage)
+  useEffect(() => {
+    const handleStorageChange = async () => {
+      // Recharger les données quand la banque change
+      if (user) {
+        try {
+          setLoading(true);
+          setError(null);
+          await Promise.all([
+            fetchDepartmentRisks(),
+            fetchCompanies()
+          ]);
+        } catch (err) {
+          setError("Erreur lors du chargement des données");
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    // Écouter les changements de localStorage
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Écouter l'événement personnalisé déclenché par le changement de banque
+    window.addEventListener('bankChanged', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('bankChanged', handleStorageChange);
+    };
   }, [user]);
   // Fonction pour filtrer le GeoJSON et n'afficher que les départements avec des entreprises
   const getFilteredGeoJsonData = () => {
