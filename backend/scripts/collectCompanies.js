@@ -12,10 +12,9 @@ const secteurs = [
   { code: '47.11A', nom: 'Commerce alimentaire' }
 ];
 
-/**
- * Recherche d'entreprises par secteur NAF via API Sirene
- */
-const searchCompaniesBySector = async (sectorCode, maxResults = 20) => {
+//Recherche d'entreprises par secteur NAF via API Sirene
+ 
+const searchCompaniesBySector = async (sectorCode, maxResults = 150) => {
   try { 
     const response = await axios.get('https://api.insee.fr/api-sirene/3.11/siret', {
       headers: {
@@ -49,8 +48,8 @@ const searchCompaniesBySector = async (sectorCode, maxResults = 20) => {
 };
 
 const collectCompanies = async () => {
-  console.log(' Collecte d\'entreprises réelles pour LoanGuard');
-  console.log(` Objectif: 100 entreprises réelles dans tes secteurs`);
+  console.log(" Collecte d'entreprises réelles pour LoanGuard");
+  console.log(` Objectif: 150 entreprises réelles dans les secteurs`);
   
   let totalCreees = 0;
   
@@ -59,7 +58,7 @@ const collectCompanies = async () => {
       console.log(`\n Secteur: ${secteur.nom} (${secteur.code})`);
       
       // Rechercher des entreprises dans ce secteur
-      const companies = await searchCompaniesBySector(secteur.code, 20);
+      const companies = await searchCompaniesBySector(secteur.code, 150);
       
       if (companies.length === 0) {
         console.log(`Aucune entreprise trouvée pour ce secteur`);
@@ -68,7 +67,7 @@ const collectCompanies = async () => {
       
       console.log(` ${companies.length} entreprises trouvées`);
       
-      // Créer chaque entreprise en base (max 20 par secteur)
+      // Créer chaque entreprise en base (max 150 par secteur)
       for (const company of companies) {
         try {
           // Vérifier si elle existe déjà
@@ -112,7 +111,7 @@ const collectCompanies = async () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
     
-    console.log(`\nCollecte terminée !`);
+    console.log("Collecte terminée !");
     console.log(`Total entreprises créées: ${totalCreees}`);
     console.log(`Jeu de données prêt !`);
     
