@@ -3,8 +3,19 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+// Configuration sécurisée des URLs
+const APP_CONFIG = {
+  // URL de l'application métier en production
+  APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  // Route de connexion
+  LOGIN_PATH: '/login'
+};
+
 export default function HeaderAnimated() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // URL complète vers l'app de connexion
+  const loginUrl = `${APP_CONFIG.APP_URL}${APP_CONFIG.LOGIN_PATH}`;
 
   return (
     <header className="bg-white border-b border-gray-100 fixed w-full top-0 z-50">
@@ -41,7 +52,9 @@ export default function HeaderAnimated() {
               <Link href="#demo" className="text-blue-800 font-semibold hover:underline">Démo</Link>
             </nav>
             <Link
-              href="/app/login"
+              href={loginUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-blue-800 text-white px-4 py-2 rounded-md hover:cursor-pointer hover:bg-blue-600 font-semibold"
             >
               Connexion
@@ -56,7 +69,9 @@ export default function HeaderAnimated() {
           <Link href="#security" className="block py-2 text-blue-800 font-semibold hover:underline">Sécurité</Link>
           <Link href="#demo" className="block py-2 text-blue-800 font-semibold hover:underline">Démo</Link>
           <Link
-            href="/app/login"
+            href={loginUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="block mt-3 bg-blue-800 text-white px-4 py-2 rounded-md hover:cursor-pointer hover:bg-blue-600 text-center font-semibold"
           >
             Connexion

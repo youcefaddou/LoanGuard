@@ -1,7 +1,7 @@
 const riskCalculationService = require("../services/riskCalculationService");
 const { PrismaClient } = require("../../generated/prisma");
 const aiTrainingService = require("../services/aiTrainingService");
-const riskPredictionModel = require("../services/riskPredictionModel");
+const riskPredictionModel = require("../services/riskPredictionModel-old");
 
 const prisma = new PrismaClient();
 
@@ -159,9 +159,9 @@ exports.trainModel = async (req, res) => {
     }
 
     // Entraîner le modèle
-    console.log("🤖 Entraînement du modèle en cours...");
+    console.log("Entraînement du modèle en cours...");
     const model = await riskPredictionModel.trainModel();
-    console.log("✅ Modèle entraîné avec succès");
+    console.log("Modèle entraîné avec succès");
 
     // Sauvegarder le modèle
     // await riskPredictionModel.saveModel(model);
@@ -172,7 +172,7 @@ exports.trainModel = async (req, res) => {
       dataPoints: trainingData.length,
     });
   } catch (error) {
-    console.error("❌ Erreur entraînement modèle:", error);
+    console.error("Erreur entraînement modèle:", error);
     console.error("Stack trace:", error.stack);
     res.status(500).json({
       message: "Erreur lors de l'entraînement du modèle",

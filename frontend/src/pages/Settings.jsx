@@ -281,7 +281,7 @@ const Settings = () => {
                         <span className="text-gray-500">
                           Précision actuelle:
                         </span>
-                        <span className="ml-2 text-gray-900">72%</span>
+                        <span className="ml-2 text-gray-900">90%</span>
                       </div>
                     </div>
                   </div>
