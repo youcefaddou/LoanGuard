@@ -5,15 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   base: '/',
   plugins: [
-    react({
-      // Optimisation React
-      babel: {
-        plugins: [
-          // Supprime les PropTypes en production
-          ['babel-plugin-transform-remove-console', { exclude: ['error', 'warn'] }]
-        ]
-      }
-    }),
+    react(),
     tailwindcss(),
   ],
   
