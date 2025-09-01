@@ -5,13 +5,17 @@ const prisma = new PrismaClient();
 // Récupérer les données de risque par département pour la carte
 const getRiskMapData = async (req, res) => {
     try {        
-         // Récupérer l'ID de la banque de l'utilisateur
-        const userBank = await prisma.userBank.findFirst({
-            where: { userId: req.user.id }
-        });
+         // Récupérer l'ID de la banque depuis le header (banque sélectionnée)
+        const bankId = req.headers['x-bank-id'];
         
-        const bankId = userBank ? userBank.bankId : null;
-        const riskData = await getRiskDataByDepartments(bankId);
+        if (!bankId) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID de banque manquant dans les headers'
+            });
+        }
+        
+        const riskData = await getRiskDataByDepartments(parseInt(bankId));
                 
         res.status(200).json({
             success: true,
@@ -31,13 +35,17 @@ const getRiskMapData = async (req, res) => {
 
 const getCompaniesMapData = async (req, res) => {
     try {
-        // Récupérer l'ID de la banque de l'utilisateur
-        const userBank = await prisma.userBank.findFirst({
-            where: { userId: req.user.id }
-        });
+        // Récupérer l'ID de la banque depuis le header (banque sélectionnée)
+        const bankId = req.headers['x-bank-id'];
         
-        const bankId = userBank ? userBank.bankId : null;
-        const companiesData = await getCompaniesWithRiskData(bankId);
+        if (!bankId) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID de banque manquant dans les headers'
+            });
+        }
+        
+        const companiesData = await getCompaniesWithRiskData(parseInt(bankId));
         
         res.status(200).json({
             success: true,

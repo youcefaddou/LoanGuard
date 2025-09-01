@@ -38,18 +38,15 @@ async function getRiskDataByDepartments(bankId = null) {
     // Récupérer toutes les entreprises avec leurs prêts et scores de risque
     const whereClause = {
       loans: {
-        some: {} // Seulement les entreprises qui ont au moins un prêt
+        some: bankId ? { bankId: bankId } : {} // Filtrer les prêts par banque
       }
     };
-    
-    if (bankId) {
-      whereClause.bankId = bankId;
-    }
     
     const companies = await prisma.company.findMany({
       where: whereClause,
       include: {
         loans: {
+          where: bankId ? { bankId: bankId } : {}, // Inclure seulement les prêts de cette banque
           include: {
             riskScores: {
               orderBy: {
@@ -131,18 +128,15 @@ async function getCompaniesWithRiskData(bankId = null) {
     try {
         const whereClause = {
             loans: {
-                some: {} // Seulement les entreprises qui ont au moins un prêt
+                some: bankId ? { bankId: bankId } : {} // Filtrer les prêts par banque
             }
         };
-        
-        if (bankId) {
-            whereClause.bankId = bankId;
-        }
         
         const companies = await prisma.company.findMany({
             where: whereClause,
             include: {
                 loans: {
+                    where: bankId ? { bankId: bankId } : {}, // Inclure seulement les prêts de cette banque
                     include: {
                         riskScores: {
                             orderBy: {
