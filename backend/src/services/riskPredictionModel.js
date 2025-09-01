@@ -42,8 +42,8 @@ const riskPredictionModel = {
     trainModel: async () => {
         try {
             const trainingData = await aiTrainingService.generateTrainingData()
-            if (trainingData.length < 10) {
-                throw new Error('Pas assez de données pour entraîner le modèle')
+            if (trainingData.length < 5) {
+                throw new Error('Pas assez de données pour entraîner le modèle (minimum 5 prêts)')
             }
             const { features, labels } = aiTrainingService.normalizeFeatures(trainingData)
 
