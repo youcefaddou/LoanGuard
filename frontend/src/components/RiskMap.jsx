@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo, useMemo } from "react";
 import { MapContainer, TileLayer, GeoJSON, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import departementsGeoJson from "../data/departements-geojson.json";
 import useAuth from '../hooks/useAuth';
 import authService from "../services/authService"
 
@@ -57,8 +56,8 @@ const RiskMap = () => {
     return "#9ca3af"; // gris par défaut
   };
 
-  // Style pour les départements
-  const departmentStyle = (feature) => {
+  // Style pour les départements - mémorisé
+  const departmentStyle = useMemo(() => (feature) => {
     const departmentCode = feature.properties.code;
     let deptData = null;
 
@@ -81,7 +80,7 @@ const RiskMap = () => {
       color: "#374151",
       fillOpacity: 0.6,
     };
-  };
+  }, [departmentData]);
 
   // Événements sur les départements
   const onEachDepartment = (feature, layer) => {
@@ -129,9 +128,14 @@ const RiskMap = () => {
     });
   };
 
-  // Chargement initial du GeoJSON
+  // Chargement lazy du GeoJSON
   useEffect(() => {
-    setGeoJsonData(departementsGeoJson);
+    // Délai pour ne pas bloquer le premier rendu
+    setTimeout(() => {
+      import("../data/departements-geojson.json").then(data => {
+        setGeoJsonData(data.default);
+      });
+    }, 100);
   }, []);
 
   const { user } = useAuth();
@@ -217,8 +221,9 @@ const RiskMap = () => {
       window.removeEventListener('bankChanged', handleStorageChange);
     };
   }, [user]);
-  // Fonction pour filtrer le GeoJSON et n'afficher que les départements avec des entreprises
-  const getFilteredGeoJsonData = () => {
+
+  // Fonction pour filtrer le GeoJSON - mémorisée
+  const filteredGeoJsonData = useMemo(() => {
     if (!geoJsonData || !Array.isArray(departmentData)) return null;
 
     // Créer un ensemble des codes de départements qui ont des entreprises
@@ -239,17 +244,77 @@ const RiskMap = () => {
     }
 
     // Créer un nouvel objet avec les features filtrées
-    const filteredGeoJsonData = {
+    return {
       type: geoJsonData.type,
       features: filteredFeatures
     };
-    
-    return filteredGeoJsonData;
-  };
+  }, [geoJsonData, departmentData]);
 
-  const MapContent = () => {
-    const filteredGeoJson = getFilteredGeoJsonData();
+  // Marqueurs mémorisés
+  const companyMarkers = useMemo(() => {
+    if (!companiesData || !Array.isArray(companiesData) || companiesData.length === 0) {
+      return null;
+    }
 
+    return companiesData.map((company) => (
+      <Marker
+        key={company.id}
+        position={[company.latitude, company.longitude]}
+        icon={createCompanyIcon(company.averageRiskScore || 0)}
+      >
+        <Popup>
+          <div className="p-2 max-w-xs">
+            <h3 className="font-bold text-lg mb-2">{company.name}</h3>
+            <p className="text-sm text-gray-600 mb-2">
+              {company.address}
+            </p>
+            <div className="mb-2">
+              <span className="text-sm font-semibold">
+                Score de risque:{" "}
+              </span>
+              <span
+                className={`text-sm font-bold ${
+                  company.averageRiskScore >= 8
+                    ? "text-red-600"
+                    : company.averageRiskScore >= 6
+                    ? "text-yellow-600"
+                    : company.averageRiskScore > 0
+                    ? "text-green-600"
+                    : "text-gray-500"
+                }`}
+              >
+                {company.averageRiskScore
+                  ? company.averageRiskScore.toFixed(1)
+                  : "N/A"}
+              </span>
+            </div>
+            <div className="space-y-1">
+              <h4 className="font-semibold text-sm">Prêts:</h4>
+              {company.loans && company.loans.length > 0 ? (
+                company.loans.map((loan, index) => (
+                  <div
+                    key={index}
+                    className="text-xs bg-gray-100 p-1 rounded"
+                  >
+                    <span className="font-medium">
+                      {loan.amount.toLocaleString()}€
+                    </span>
+                    <span className="text-gray-500 ml-2">
+                      Risque: {loan.riskScore}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-gray-500">Aucun prêt</p>
+              )}
+            </div>
+          </div>
+        </Popup>
+      </Marker>
+    ));
+  }, [companiesData]);
+
+  const MapContent = memo(() => {
     return (
       <>
         <TileLayer
@@ -258,77 +323,19 @@ const RiskMap = () => {
         />
 
         {/* Départements GeoJSON - seulement ceux avec des entreprises */}
-        {filteredGeoJson && (
+        {filteredGeoJsonData && (
           <GeoJSON
-            data={filteredGeoJson}
+            data={filteredGeoJsonData}
             style={departmentStyle}
             onEachFeature={onEachDepartment}
           />
         )}
 
         {/* Marqueurs des entreprises */}
-        {companiesData &&
-          Array.isArray(companiesData) &&
-          companiesData.length > 0 &&
-          companiesData.map((company) => (
-            <Marker
-              key={company.id}
-              position={[company.latitude, company.longitude]}
-              icon={createCompanyIcon(company.averageRiskScore || 0)}
-            >
-              <Popup>
-                <div className="p-2 max-w-xs">
-                  <h3 className="font-bold text-lg mb-2">{company.name}</h3>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {company.address}
-                  </p>
-                  <div className="mb-2">
-                    <span className="text-sm font-semibold">
-                      Score de risque:{" "}
-                    </span>
-                    <span
-                      className={`text-sm font-bold ${
-                        company.averageRiskScore >= 8
-                          ? "text-red-600"
-                          : company.averageRiskScore >= 6
-                          ? "text-yellow-600"
-                          : company.averageRiskScore > 0
-                          ? "text-green-600"
-                          : "text-gray-500"
-                      }`}
-                    >
-                      {company.averageRiskScore
-                        ? company.averageRiskScore.toFixed(1)
-                        : "N/A"}
-                    </span>
-                  </div>
-                  <div className="space-y-1">
-                    <h4 className="font-semibold text-sm">Prêts:</h4>
-                    {company.loans && company.loans.length > 0 ? (
-                      company.loans.map((loan, index) => (
-                        <div
-                          key={index}
-                          className="text-xs bg-gray-100 p-1 rounded"
-                        >
-                          <span className="font-medium">
-                            {loan.amount.toLocaleString()}€
-                          </span>
-                          <span className="text-gray-500 ml-2">
-                            Risque: {loan.riskScore}
-                          </span>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-xs text-gray-500">Aucun prêt</p>
-                    )}
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+        {companyMarkers}
       </>
     );
-  };
+  });
 
   const MapComponent = ({ isFullscreen = false }) => (
     <MapContainer
@@ -347,9 +354,10 @@ const RiskMap = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="h-64 md:h-80 lg:h-96 w-full bg-gray-100 rounded-lg flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+          <p className="text-sm text-gray-500">Chargement de la carte...</p>
         </div>
       </div>
     );
@@ -407,10 +415,6 @@ const RiskMap = () => {
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-red-500 rounded-full border border-white"></div>
               <span>Risque élevé (8+)</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-gray-400 rounded-full border border-white"></div>
-              <span>Pas de risque</span>
             </div>
           </div>
         </div>
