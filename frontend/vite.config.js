@@ -5,14 +5,53 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   base: '/',
   plugins: [
-    react(),
+    react({
+      // Optimisation React
+      babel: {
+        plugins: [
+          // Supprime les PropTypes en production
+          ['babel-plugin-transform-remove-console', { exclude: ['error', 'warn'] }]
+        ]
+      }
+    }),
     tailwindcss(),
   ],
+  
+  // Optimisations build
+  build: {
+    // Tree shaking amélioré
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Sépare les librairies lourdes
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'chart-vendor': ['chart.js', 'react-chartjs-2'],
+          'map-vendor': ['leaflet', 'react-leaflet'],
+        }
+      }
+    },
+    // Compression et minification
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      }
+    },
+    // Taille des chunks
+    chunkSizeWarningLimit: 1000,
+  },
+  
+  // Optimisations dev
   server: {
     proxy: {
-      // Dev proxy used when running `vite` locally. In production the front must call
-      // the backend via the environment variable VITE_API_URL (configured at build time).
       '/api': 'http://localhost:4000'
     }
+  },
+  
+  // Préchargement intelligent
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'],
+    exclude: ['@vite/client', '@vite/env']
   }
 })
