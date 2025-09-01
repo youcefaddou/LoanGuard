@@ -62,6 +62,8 @@ export default function DemoAnimated({ demoScreens }) {
               src={demoScreens[active].image}
               alt={demoScreens[active].title}
               className="w-full max-w-lg rounded-md border border-gray-200 mb-4 bg-white object-contain"
+              loading="lazy"
+              decoding="async"
             />
             <div className="text-blue-600 font-semibold text-lg mb-1 text-center">
               {demoScreens[active].title}
@@ -99,7 +101,7 @@ export default function DemoAnimated({ demoScreens }) {
           className={`flex flex-wrap justify-center gap-6 ${animStats}`}
         >
           <div className="bg-gray-100 border border-gray-200 rounded-md px-8 py-6 text-center min-w-[120px]">
-            <div className="text-2xl font-bold text-blue-500 mb-1">99.9%</div>
+            <div className="text-2xl font-bold text-blue-500 mb-1">90%</div>
             <div className="text-gray-500 font-medium text-xs uppercase tracking-wide">
               Précision IA
             </div>

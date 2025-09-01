@@ -20,6 +20,12 @@ const nextConfig = {
   // Configuration des assets
   assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
   
+  // Optimisations de performance
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['react-icons'],
+  },
+
   // Headers de sécurité (complément de Nginx)
   async headers() {
     return [
@@ -33,6 +39,10 @@ const nextConfig = {
           {
             key: 'X-Powered-By',
             value: 'LoanGuard Security'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
           }
         ]
       }

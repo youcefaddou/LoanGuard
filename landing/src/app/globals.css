@@ -24,3 +24,34 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Optimisations de performance */
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Amélioration du rendu des fonts */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Optimisation du scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Cache le contenu pendant le chargement pour éviter le FOUC */
+.loading {
+  visibility: hidden;
+}
+
+.loaded {
+  visibility: visible;
+}
