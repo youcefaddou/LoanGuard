@@ -68,7 +68,6 @@ const RiskEvolutionChart = () => {
           });
         } else {
           // Si pas de données, utiliser les données simulées
-          console.log('Aucune donnée trouvée, utilisation des données simulées');
           const simulatedData = generateSimulatedData();
           
           setChartData({

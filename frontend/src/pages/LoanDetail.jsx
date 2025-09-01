@@ -36,7 +36,6 @@ const LoanDetail = () => {
 
   const handleExport = () => {
     // Logique d'export à implémenter
-    console.log("Export des détails du prêt");
   }
   const handleEdit = () => {
     setIsEditModalOpen(true);
