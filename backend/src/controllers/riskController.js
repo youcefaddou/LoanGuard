@@ -143,10 +143,15 @@ exports.getRiskEvolution = async (req, res) => {
 };
 exports.trainModel = async (req, res) => {
   try {
+    console.log(" Début de l'entraînement du modèle IA");
+    
     // Générer les données d'entraînement depuis vos prêts
+    console.log(" Génération des données d'entraînement...");
     const trainingData = await aiTrainingService.generateTrainingData();
+    console.log(` ${trainingData.length} échantillons générés`);
 
     if (trainingData.length < 5) {
+      console.log(" Pas assez de données pour l'entraînement");
       return res.status(400).json({
         message:
           "Pas assez de données pour entraîner le modèle (minimum 5 prêts)",
@@ -154,7 +159,9 @@ exports.trainModel = async (req, res) => {
     }
 
     // Entraîner le modèle
+    console.log("🤖 Entraînement du modèle en cours...");
     const model = await riskPredictionModel.trainModel();
+    console.log("✅ Modèle entraîné avec succès");
 
     // Sauvegarder le modèle
     // await riskPredictionModel.saveModel(model);
@@ -165,9 +172,11 @@ exports.trainModel = async (req, res) => {
       dataPoints: trainingData.length,
     });
   } catch (error) {
-    console.error("Erreur entraînement modèle:", error);
+    console.error("❌ Erreur entraînement modèle:", error);
+    console.error("Stack trace:", error.stack);
     res.status(500).json({
       message: "Erreur lors de l'entraînement du modèle",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
