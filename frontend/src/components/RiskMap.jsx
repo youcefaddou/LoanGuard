@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import departementsGeoJson from "../data/departements-geojson.json";
 import useAuth from '../hooks/useAuth';
+import authService from "../services/authService"
 
 // Style CSS pour la carte plein écran
 const fullscreenMapStyle = {
@@ -138,15 +139,11 @@ const RiskMap = () => {
   // Fonction pour récupérer les données de risque par département avec authentification
   const fetchDepartmentRisks = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/map/risk-data`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
-      const result = await response.json();
-      if (result.success) {
-        setDepartmentData(result.data);
-      }
+      const response = await authService.secureRequest('/api/map/risk-data');
+    const result = await response.json();
+    if (result.success) {
+      setDepartmentData(result.data);
+    }
     } catch (error) {
       console.error('Erreur lors de la récupération des risques:', error);
     }
@@ -155,11 +152,7 @@ const RiskMap = () => {
   // Fonction pour récupérer les données des entreprises avec authentification
   const fetchCompanies = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/map/companies-data`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
+      const response = await authService.secureRequest('/api/map/companies-data');
       const result = await response.json();
       if (result.success) {
         setCompaniesData(result.data);
