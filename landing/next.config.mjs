@@ -22,31 +22,7 @@ const nextConfig = {
   
   // Optimisations de performance
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['react-icons'],
-  },
-
-  // Headers de sécurité (complément de Nginx)
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on'
-          },
-          {
-            key: 'X-Powered-By',
-            value: 'LoanGuard Security'
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
-          }
-        ]
-      }
-    ]
   }
 }
 
