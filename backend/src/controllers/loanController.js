@@ -6,6 +6,7 @@ exports.createLoan = async (req, res) => {
   try {
     const {
       companyId,
+      bankId,
       amount,
       interestRate,
       duration,
@@ -13,9 +14,17 @@ exports.createLoan = async (req, res) => {
       status = "Actif",
     } = req.body;
 
-    if (!companyId || !amount || !interestRate || !duration || !startDate) {
+    if (
+      !companyId ||
+      !bankId ||
+      !amount ||
+      !interestRate ||
+      !duration ||
+      !startDate
+    ) {
       return res.status(400).json({ message: "Tous les champs sont requis" });
     }
+
     //calcul date d'échéance - date du dernier paiement mensuel
     const startDateObj = new Date(startDate);
     const dueDate = new Date(startDateObj);
@@ -37,7 +46,7 @@ exports.createLoan = async (req, res) => {
     const newLoan = await prisma.loan.create({
       data: {
         userId: req.user.id,
-        bankId: parseInt(req.headers["x-bank-id"]),
+        bankId: parseInt(bankId),
         companyId: parseInt(companyId),
         amount: parseFloat(amount),
         interestRate: parseFloat(interestRate),
@@ -277,7 +286,7 @@ exports.getWatchlist = async (req, res) => {
         const scoreB = b.riskScores[0]?.score || 0;
         return scoreB - scoreA;
       })
-      .slice(0, 6); 
+      .slice(0, 6);
 
     //formater les données pour le front
     const formattedLoans = watchlistLoans.map((loan) => ({

@@ -1,32 +1,32 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 // middleware d'authentification JWT avec cookies httpOnly
 const authMiddleware = function (req, res, next) {
   try {
     // recupération du token depuis les cookies
     let token = req.cookies.authToken;
-    
+
     // Si pas de token dans les cookies, regarder dans les headers
     if (!token) {
       const authHeader = req.headers.authorization;
-      if (authHeader && authHeader.startsWith('Bearer ')) {
+      if (authHeader && authHeader.startsWith("Bearer ")) {
         token = authHeader.substring(7); // Enlever "Bearer "
       }
     }
-    
+
     if (!token) {
-      return res.status(401).json({ 
-        message: "Token d'authentification manquant"
+      return res.status(401).json({
+        message: "Token d'authentification manquant",
       });
     }
-    
+
     // Vérification et décodage du token JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
+
     // validation des données du token
     if (!decoded.id || !decoded.role || !decoded.email) {
-      return res.status(401).json({ 
-        message: 'Token invalide - données manquantes' 
+      return res.status(401).json({
+        message: "Token invalide - données manquantes",
       });
     }
     // Ajout des infos utilisateur à la requête
@@ -34,26 +34,26 @@ const authMiddleware = function (req, res, next) {
       id: decoded.id,
       role: decoded.role,
       email: decoded.email,
+      bankId: decoded.bankId, // Peut être undefined pour RES
     };
-    
+
     next();
-    
   } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ 
-        message: 'Token expiré. Veuillez vous reconnecter' 
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        message: "Token expiré. Veuillez vous reconnecter",
       });
     }
-    
-    if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ 
-        message: 'Token invalide' 
+
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({
+        message: "Token invalide",
       });
     }
-    
-    console.error('Erreur middleware auth:', error);
-    return res.status(500).json({ 
-      message: 'Erreur serveur lors de l\'authentification' 
+
+    console.error("Erreur middleware auth:", error);
+    return res.status(500).json({
+      message: "Erreur serveur lors de l'authentification",
     });
   }
 };

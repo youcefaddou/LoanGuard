@@ -2,6 +2,7 @@
 const checkRole = (...allowedRoles) => {
   return (req, res, next) => {
     try {
+
       //verifier que l'utilisateur est authentifié
       if (!req.user || !req.user.role) {
         return res.status(401).json({ 
