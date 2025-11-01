@@ -15,7 +15,7 @@ router.get('/', userController.getUsers);
 router.post('/', requireResponsable, userController.createUser);
 
 // Modifier un utilisateur (CHG + RES)
-router.put('/:id', requireResponsable, requireAnyUser, userController.updateUser);
+router.put('/:id', requireAnyUser, userController.updateUser);
 
 // Supprimer un utilisateur (SEULEMENT RES)
 router.delete('/:id', requireResponsable, userController.deleteUser);
