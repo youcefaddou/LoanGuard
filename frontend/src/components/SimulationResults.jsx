@@ -3,7 +3,8 @@ import authService from "../services/authService";
 
 const SimulationResults = ({ loanId, refreshTrigger }) => {
   const [currentScore, setCurrentScore] = useState(null);
-  const [previousScore, setPreviousScore] = useState(null);
+  const [simulatedScore, setSimulatedScore] = useState(null);
+  const [hasSimulation, setHasSimulation] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,31 +21,28 @@ const SimulationResults = ({ loanId, refreshTrigger }) => {
           const data = await response.json();
           const scores = data.scores || [];
 
-          if (scores.length >= 2) {
-            setCurrentScore(scores[0]); // Plus récent
-            setPreviousScore(scores[1]); // Précédent
-          } else if (scores.length === 1) {
+          if (scores.length >= 1) {
+            // Le score le plus récent = score actuel du prêt
             setCurrentScore(scores[0]);
-            setPreviousScore({ score: 5.0, riskLevel: "Faible" });
+            
+            // Si refreshTrigger > 0, on a lancé une simulation
+            if (refreshTrigger > 0 && scores.length >= 2) {
+              setSimulatedScore(scores[0]); // Le plus récent après simulation
+              setHasSimulation(true);
+            }
           } else {
-            // Aucun score, essayer de calculer
+            // Aucun score, calculer le score actuel
             const calcResponse = await authService.secureRequest(
               `/api/risk/calculate/${loanId}`
             );
             if (calcResponse.ok) {
               const calcData = await calcResponse.json();
               setCurrentScore(calcData);
-              setPreviousScore({ score: 5.0, riskLevel: "Faible" });
             }
           }
-        } else {
-          setCurrentScore(null);
-          setPreviousScore(null);
         }
       } catch (error) {
         console.error("Erreur récupération scores:", error);
-        setCurrentScore(null);
-        setPreviousScore(null);
       } finally {
         setLoading(false);
       }
@@ -54,25 +52,25 @@ const SimulationResults = ({ loanId, refreshTrigger }) => {
   }, [loanId, refreshTrigger]);
 
   const getScoreColor = (score) => {
-    if (score >= 8) return "text-red-600";      // Élevé = Rouge
-    if (score >= 6) return "text-orange-600";   // Moyen = Orange  
-    return "text-green-600";                    // Faible = Vert
+    if (score >= 8) return "text-red-600";
+    if (score >= 6) return "text-orange-600";
+    return "text-green-600";
   };
 
   const getBackgroundColor = (score) => {
-    if (score >= 8) return "bg-red-100";        // Élevé = Rouge
-    if (score >= 6) return "bg-orange-100";     // Moyen = Orange
-    return "bg-green-100";                      // Faible = Vert
+    if (score >= 8) return "bg-red-100";
+    if (score >= 6) return "bg-orange-100";
+    return "bg-green-100";
   };
 
   const getRiskLevelColor = (riskLevel) => {
     switch (riskLevel) {
       case "Élevé":
-        return "text-red-800";    // Rouge
+        return "text-red-800";
       case "Moyen":
-        return "text-orange-800"; // Orange
+        return "text-orange-800";
       default:
-        return "text-green-800";  // Vert (Faible)
+        return "text-green-800";
     }
   };
 
@@ -87,7 +85,7 @@ const SimulationResults = ({ loanId, refreshTrigger }) => {
   if (!currentScore) {
     return (
       <div className="flex items-center justify-center h-64 text-gray-500">
-        Aucune simulation disponible
+        Aucun score disponible pour ce prêt
       </div>
     );
   }
@@ -95,26 +93,16 @@ const SimulationResults = ({ loanId, refreshTrigger }) => {
   return (
     <div className="text-center">
       <div className="flex items-center justify-center space-x-8 mb-6">
-        {/* Score actuel (précédent) */}
+        {/* Score actuel (toujours affiché) */}
         <div className="text-center">
           <p className="text-sm text-gray-600 mb-2">Score actuel</p>
-          <div className={`w-20 h-20 rounded-full ${getBackgroundColor(
-            previousScore && previousScore.score ? previousScore.score : 5.0
-          )} flex items-center justify-center`}>
-            <span
-              className={`text-2xl font-bold ${getScoreColor(
-                previousScore && previousScore.score ? previousScore.score : 5.0
-              )}`}
-            >
-              {previousScore && previousScore.score ? previousScore.score.toFixed(1) : "5.0"}
+          <div className={`w-20 h-20 rounded-full ${getBackgroundColor(currentScore.score)} flex items-center justify-center`}>
+            <span className={`text-2xl font-bold ${getScoreColor(currentScore.score)}`}>
+              {currentScore.score.toFixed(1)}
             </span>
           </div>
-          <p
-            className={`text-sm mt-2 ${getRiskLevelColor(
-              previousScore && previousScore.riskLevel ? previousScore.riskLevel : "Faible"
-            )}`}
-          >
-            Risque {previousScore && previousScore.riskLevel ? previousScore.riskLevel : "Faible"}
+          <p className={`text-sm mt-2 ${getRiskLevelColor(currentScore.riskLevel)}`}>
+            Risque {currentScore.riskLevel}
           </p>
         </div>
 
@@ -129,23 +117,38 @@ const SimulationResults = ({ loanId, refreshTrigger }) => {
           </svg>
         </div>
 
-        {/* Score simulé (actuel) */}
+        {/* Score simulé (affiché SEULEMENT après simulation) */}
         <div className="text-center">
           <p className="text-sm text-gray-600 mb-2">Nouveau score simulé</p>
-          <div className={`w-20 h-20 rounded-full ${getBackgroundColor(currentScore.score)} flex items-center justify-center`}>
-            <span
-              className={`text-2xl font-bold ${getScoreColor(currentScore.score)}`}
-            >
-              {currentScore.score.toFixed(1)}
-            </span>
-          </div>
-          <p
-            className={`text-sm mt-2 ${getRiskLevelColor(currentScore.riskLevel)}`}
-          >
-            Risque {currentScore.riskLevel}
-          </p>
+          {hasSimulation && simulatedScore ? (
+            <>
+              <div className={`w-20 h-20 rounded-full ${getBackgroundColor(simulatedScore.score)} flex items-center justify-center`}>
+                <span className={`text-2xl font-bold ${getScoreColor(simulatedScore.score)}`}>
+                  {simulatedScore.score.toFixed(1)}
+                </span>
+              </div>
+              <p className={`text-sm mt-2 ${getRiskLevelColor(simulatedScore.riskLevel)}`}>
+                Risque {simulatedScore.riskLevel}
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300">
+                <span className="text-3xl font-light text-gray-400">-</span>
+              </div>
+              <p className="text-sm mt-2 text-gray-500 italic">
+                En attente
+              </p>
+            </>
+          )}
         </div>
       </div>
+
+      {!hasSimulation && (
+        <p className="text-sm text-gray-500 mt-4">
+          Configurez et lancez une simulation pour voir l'impact sur le score
+        </p>
+      )}
     </div>
   );
 };
