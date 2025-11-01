@@ -131,7 +131,7 @@ const SimulationResults = ({ loanId, refreshTrigger }) => {
 
         {/* Score simulé (actuel) */}
         <div className="text-center">
-          <p className="text-sm text-gray-600 mb-2">Score simulé</p>
+          <p className="text-sm text-gray-600 mb-2">Nouveau score simulé</p>
           <div className={`w-20 h-20 rounded-full ${getBackgroundColor(currentScore.score)} flex items-center justify-center`}>
             <span
               className={`text-2xl font-bold ${getScoreColor(currentScore.score)}`}
