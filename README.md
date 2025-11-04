@@ -11,7 +11,7 @@ Principales fonctionnalités
 - Modélisation et simulation du risque de défaut pour un prêt.
 - Gestion multi-agence (création, modification, périmètre des données).
 - Gestion des prêts : création, suivi, tableau d'amortissement et statut.
-- Gestion des utilisateurs et des rôles (admin, agent, analyste).
+- Gestion des utilisateurs et des rôles (admin, chargé de risques, responsable d'agence).
 - Tableaux et rapports pour l'analyse du portefeuille de crédits.
 - API REST pour intégration et automatisation.
 
