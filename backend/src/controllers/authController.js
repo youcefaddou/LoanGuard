@@ -139,7 +139,7 @@ exports.login = async (req, res) => {
     const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production', // true en production (HTTPS via nginx)
-    sameSite: 'Strict', // 'Strict' ou 'Lax' si tu veux moins restrictif
+    sameSite: 'Strict', // 'Strict' ou 'Lax' si on veut moins restrictif
     domain: '.ri7.tech', // permet le partage du cookie entre sous-domaines
     maxAge: 8 * 60 * 60 * 1000, // 8 heures en ms (cohérent avec le JWT)
     path: '/'
