@@ -4,8 +4,8 @@ LoanGuard est une application pour simuler le risque de défaut de remboursement
 LoanGuard contient :
 - un backend (API, logique métier, gestion des données),
 - un frontend (interface d'administration et d'analyse),
-- une landing page,
-- des fichiers de configuration pour le déploiement (PM2 + Nginx en production, Docker en solution de secours).
+- une landing page (avec NextJS: choix purement académique, pour un référencement SEO optimal),
+- des fichiers de configuration pour le déploiement (HTTPS Let's Encrypt + PM2 + Nginx en production, Docker en solution de secours).
 
 Principales fonctionnalités
 - Modélisation et simulation du risque de défaut pour un prêt.
