@@ -63,4 +63,11 @@ Ressources et fichiers utiles
 - DEPLOY.md — instructions complètes de déploiement
 - nginx.conf — modèle de configuration pour le reverse proxy
 - docker-compose.yml — orchestration Docker (option de secours)
+
+Copyright (c) 2025 ADDOU Youcef
+Tous droits réservés.
+
+Ce logiciel et sa documentation sont la propriété exclusive de ADDOU Youcef. Aucune partie de ce logiciel ne peut être reproduite, distribuée, modifiée ou transmise sous quelque forme ou par quelque moyen que ce soit sans l'autorisation écrite préalable du titulaire du droit d'auteur.
+
+Pour toute demande de licence, d'utilisation commerciale ou de redistribution, contactez : youcefaddou@gmail.com
 ```
