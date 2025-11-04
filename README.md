@@ -8,11 +8,11 @@ LoanGuard contient :
 - des fichiers de configuration pour le déploiement (HTTPS Let's Encrypt + PM2 + Nginx en production, Docker en solution de secours).
 
 Principales fonctionnalités
-- Modélisation et simulation du risque de défaut pour un prêt.
-- Gestion multi-agence (création, modification, périmètre des données).
-- Gestion des prêts : création, suivi, tableau d'amortissement et statut.
+- Modélisation et simulation du risque de défaut pour un prêt en intégrant des données externes (API météorologique, INSEE).
+- Gestion multi-agence (côté admin: création, modification, périmètre des données).
+- Gestion des prêts : création, suivi, suppression et statut.
 - Gestion des utilisateurs et des rôles (admin, chargé de risques, responsable d'agence).
-- Tableaux et rapports pour l'analyse du portefeuille de crédits.
+- Tableaux de bord et rapports pour l'analyse du portefeuille de crédits.
 - API REST pour intégration et automatisation.
 
 Arborescence principale (extraits)
