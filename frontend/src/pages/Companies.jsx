@@ -20,7 +20,9 @@ const Companies = () => {
 
   const fetchCompanies = async () => {
     try {
-      const bankId = localStorage.getItem('selectedBankId') || 1;
+      // Récupérer la banque depuis le cache
+      const selectedBank = authService.getSelectedBankFromCache();
+      const bankId = selectedBank?.id || 1;
       const response = await authService.secureRequest(`/api/companies/bank/${bankId}`);
       
       if (response.ok) {

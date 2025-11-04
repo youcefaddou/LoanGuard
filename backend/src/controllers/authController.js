@@ -339,3 +339,107 @@ exports.logout = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la déconnexion" });
   }
 };
+
+// Récupérer les informations de l'utilisateur actuellement connecté
+exports.getCurrentUser = async (req, res) => {
+  const userId = req.user.id; // Vient du middleware d'authentification
+  const userRole = req.user.role;
+
+  try {
+    // Récupérer les informations de l'utilisateur
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        lastName: true,
+        firstName: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Utilisateur non trouvé",
+      });
+    }
+
+    // Récupérer la banque sélectionnée depuis le header (si présente)
+    const selectedBankId = req.headers['x-bank-id'];
+    let selectedBank = null;
+
+    if (selectedBankId) {
+      // Vérifier que l'utilisateur a accès à cette banque
+      const userBank = await prisma.userBank.findFirst({
+        where: {
+          userId: userId,
+          bankId: parseInt(selectedBankId),
+        },
+        include: {
+          bank: true,
+        },
+      });
+
+      if (userBank) {
+        selectedBank = {
+          id: userBank.bank.id,
+          name: userBank.bank.name,
+          address: userBank.bank.address,
+          city: userBank.bank.city,
+        };
+      }
+    }
+
+    // Si pas de banque dans le header, récupérer la banque par défaut (si applicable)
+    if (!selectedBank) {
+      const userBanks = await prisma.userBank.findMany({
+        where: { userId: userId },
+        include: { bank: true },
+      });
+
+      // Pour CHG, il doit avoir exactement une banque
+      if (userRole === "CHG" && userBanks.length > 0) {
+        selectedBank = {
+          id: userBanks[0].bank.id,
+          name: userBanks[0].bank.name,
+          address: userBanks[0].bank.address,
+          city: userBanks[0].bank.city,
+        };
+      }
+      // Pour RES avec une seule banque, on la retourne par défaut
+      else if (userRole === "RES" && userBanks.length === 1) {
+        selectedBank = {
+          id: userBanks[0].bank.id,
+          name: userBanks[0].bank.name,
+          address: userBanks[0].bank.address,
+          city: userBanks[0].bank.city,
+        };
+      }
+      // Pour RES avec plusieurs banques, retourner toutes les banques disponibles
+      else if (userRole === "RES" && userBanks.length > 1) {
+        const availableBanks = userBanks.map((ub) => ({
+          id: ub.bank.id,
+          name: ub.bank.name,
+          address: ub.bank.address,
+          city: ub.bank.city,
+        }));
+        
+        return res.json({
+          user: user,
+          selectedBank: null,
+          availableBanks: availableBanks,
+        });
+      }
+    }
+
+    res.json({
+      user: user,
+      selectedBank: selectedBank,
+    });
+  } catch (error) {
+    console.error("Erreur récupération utilisateur actuel:", error);
+    res.status(500).json({
+      message: "Erreur serveur lors de la récupération de l'utilisateur",
+    });
+  }
+};

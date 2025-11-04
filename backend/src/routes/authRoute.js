@@ -14,4 +14,7 @@ router.post('/select-bank', authMiddleware, authController.selectBank);
 // Déconnexion sécurisée (nécessite authentification)
 router.post('/logout', authMiddleware, authController.logout);
 
+// Récupérer les informations de l'utilisateur actuel (nécessite authentification)
+router.get('/me', authMiddleware, authController.getCurrentUser);
+
 module.exports = router;

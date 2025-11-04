@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import authService from "../services/authService";
 import {
   ChartBarIcon,
   BanknotesIcon,
@@ -13,6 +14,7 @@ import {
 
 const Sidebar = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -60,6 +62,18 @@ const Sidebar = () => {
       roles: ["RES", "CHG"],
     },
   ];
+
+  // Récupérer les données utilisateur au chargement
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await authService.getCurrentUser();
+      if (userData) {
+        setUser(userData.user);
+      }
+    };
+    fetchUserData();
+  }, []);
+
   // Écouter les changements depuis le Header
   useEffect(() => {
     const handleMenuToggle = () => {
@@ -74,8 +88,10 @@ const Sidebar = () => {
     };
   }, []);
 
-  // Récupérer les données de l'utilisateur avec vérification
-  const user = JSON.parse(localStorage.getItem("user"));
+  // Si les données ne sont pas encore chargées, ne rien afficher
+  if (!user) {
+    return null;
+  }
 
   const userRole = user.role;
 

@@ -1,7 +1,9 @@
 // Service d'authentification pour LoanGuard
 const API_URL = import.meta.env.VITE_API_URL; 
 
-
+// Cache en mémoire pour les données utilisateur (non visible dans F12)
+let userCache = null;
+let selectedBankCache = null;
 
 const authService = {
   // Connexion utilisateur
@@ -19,15 +21,14 @@ const authService = {
       const data = await response.json();
 
       if (response.ok) {
-        // Stocker les données utilisateur (pas de token car c'est en cookie)
+        // Stocker en mémoire au lieu de localStorage (non visible dans F12)
         if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user));
+          userCache = data.user;
         }
         
-        // Stocker la banque sélectionnée si elle est fournie (connexion directe)
+        // Stocker la banque sélectionnée en mémoire
         if (data.selectedBank) {
-          localStorage.setItem('selectedBank', JSON.stringify(data.selectedBank));
-          localStorage.setItem('selectedBankId', data.selectedBank.id);
+          selectedBankCache = data.selectedBank;
         }
         
         return data; // Retourner directement les données du backend
@@ -55,10 +56,9 @@ const authService = {
       const data = await response.json();
 
       if (response.ok) {
-        // Stocker la banque sélectionnée
+        // Stocker la banque sélectionnée en mémoire
         if (data.selectedBank) {
-          localStorage.setItem('selectedBank', JSON.stringify(data.selectedBank));
-          localStorage.setItem('selectedBankId', data.selectedBank.id);
+          selectedBankCache = data.selectedBank;
         }
         return data;
       } else {
@@ -81,7 +81,11 @@ const authService = {
       console.error('Erreur lors de la déconnexion:', error);
     }
     
-    // Nettoyer le localStorage
+    // Nettoyer le cache mémoire
+    userCache = null;
+    selectedBankCache = null;
+    
+    // Nettoyer aussi localStorage (au cas où il reste des données anciennes)
     localStorage.removeItem('user');
     localStorage.removeItem('selectedBank');
     localStorage.removeItem('selectedBankId');
@@ -90,20 +94,77 @@ const authService = {
     window.location.href = '/login';
   },
 
-  // Obtenir l'utilisateur actuel
-  getCurrentUser() {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+  // Récupérer les informations de l'utilisateur actuel depuis le backend
+  async getCurrentUser() {
+    try {
+      // Si on a déjà les données en cache, les retourner
+      if (userCache) {
+        return {
+          user: userCache,
+          selectedBank: selectedBankCache,
+        };
+      }
+
+      // Sinon, récupérer depuis le backend
+      const selectedBankId = selectedBankCache?.id;
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      if (selectedBankId) {
+        headers['x-bank-id'] = selectedBankId;
+      }
+
+      const response = await fetch(`${API_URL}/api/auth/me`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: headers,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Mettre en cache
+        userCache = data.user;
+        if (data.selectedBank) {
+          selectedBankCache = data.selectedBank;
+        }
+        return data;
+      } else if (response.status === 401) {
+        // Non authentifié
+        userCache = null;
+        selectedBankCache = null;
+        return null;
+      } else {
+        throw new Error('Erreur lors de la récupération des informations utilisateur');
+      }
+    } catch (error) {
+      console.error('Erreur getCurrentUser:', error);
+      return null;
+    }
+  },
+
+  // Obtenir l'utilisateur depuis le cache (pour usage synchrone)
+  getUserFromCache() {
+    return userCache;
+  },
+
+  // Obtenir la banque sélectionnée depuis le cache
+  getSelectedBankFromCache() {
+    return selectedBankCache;
   },
 
   // Vérifier si l'utilisateur est connecté
   isAuthenticated() {
-    return this.getCurrentUser() !== null;
+    return userCache !== null;
+  },
+
+  // Mettre à jour la banque sélectionnée dans le cache
+  updateSelectedBankCache(bank) {
+    selectedBankCache = bank;
   },
 
   // requête sécurisée avec cookies
   async secureRequest(url, options = {}) {
-    const selectedBankId = localStorage.getItem('selectedBankId')
+    const selectedBankId = selectedBankCache?.id;
     
     const headers = {
       'Content-Type': 'application/json'

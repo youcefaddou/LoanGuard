@@ -11,16 +11,27 @@ import {
 const Header = ({ onAddLoan }) => {
   const location = useLocation();
 
-  //récuperer les données de l'user depuis le service
-  const user = authService.getCurrentUser();
-  //récuperer les données de la banque sélectionnée
-  const selectedBank = JSON.parse(localStorage.getItem("selectedBank"));
+  // État pour les données utilisateur et banque
+  const [user, setUser] = useState(null);
+  const [selectedBank, setSelectedBank] = useState(null);
 
   //état pour les menus
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLogoutMenuOpen, setIsLogoutMenuOpen] = useState(false);
   const [isBankMenuOpen, setIsBankMenuOpen] = useState(false);
   const [availableBanks, setAvailableBanks] = useState([]); // pour les banques dispo
+
+  // Récupérer les données utilisateur au chargement
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await authService.getCurrentUser();
+      if (userData) {
+        setUser(userData.user);
+        setSelectedBank(userData.selectedBank);
+      }
+    };
+    fetchUserData();
+  }, []);
 
   useEffect(() => {
     const fetchBanks = async () => {
@@ -51,20 +62,6 @@ const Header = ({ onAddLoan }) => {
     }
   }, [user, location.pathname, availableBanks.length]);
 
-  // Initialisation du selectedBank pour le CHG
-  useEffect(() => {
-    if (user && user.role === "CHG" && !localStorage.getItem("selectedBank")) {
-      // Récupère les banques de l'utilisateur
-      const userBanks = user.banks || [];
-      if (userBanks.length === 1) {
-        localStorage.setItem("selectedBank", JSON.stringify(userBanks[0]));
-        localStorage.setItem("selectedBankId", userBanks[0].id);
-        // reload pour forcer la prise en compte
-        window.location.reload();
-      }
-    }
-  }, [user]);
-
   // Fermer les menus quand on clique ailleurs
   useEffect(() => {
     const handleClickOutside = () => {
@@ -85,8 +82,9 @@ const Header = ({ onAddLoan }) => {
   const isConnectedPage = user && !isAuthPage;
 
   const handleBankChange = (bank) => {
-    localStorage.setItem("selectedBank", JSON.stringify(bank));
-    localStorage.setItem("selectedBankId", bank.id);
+    // Mettre à jour le cache mémoire
+    authService.updateSelectedBankCache(bank);
+    setSelectedBank(bank);
     setIsBankMenuOpen(false);
     
     // Déclencher un événement personnalisé pour notifier les composants
