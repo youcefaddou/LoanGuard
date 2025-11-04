@@ -12,7 +12,7 @@
     "schema": "./prisma"
   },
   "keywords": [],
-  "author": "",
+  "author": "youcefaddou",
   "license": "UNLICENSED",
   "type": "commonjs",
   "dependencies": {
