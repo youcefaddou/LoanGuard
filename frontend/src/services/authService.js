@@ -153,6 +153,8 @@ const authService = {
   },
 
   // Vérifier si l'utilisateur est connecté
+  // Cette méthode est utilisée de manière synchrone, donc elle ne vérifie que le cache
+  // Pour une vérification complète avec le backend, utilisez getCurrentUser()
   isAuthenticated() {
     return userCache !== null;
   },

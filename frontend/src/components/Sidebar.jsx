@@ -88,9 +88,18 @@ const Sidebar = () => {
     };
   }, []);
 
-  // Si les données ne sont pas encore chargées, ne rien afficher
+  // Si les données ne sont pas encore chargées, afficher un squelette de chargement
   if (!user) {
-    return null;
+    return (
+      <div className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-gray-200">
+        <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
+          <div className="flex items-center flex-shrink-0 px-4 mb-6">
+            <div className="w-10 h-10 bg-gray-200 rounded-xl animate-pulse"></div>
+            <div className="ml-3 h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const userRole = user.role;

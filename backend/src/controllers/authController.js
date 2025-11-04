@@ -369,11 +369,19 @@ exports.getCurrentUser = async (req, res) => {
     let selectedBank = null;
 
     if (selectedBankId) {
+      // Valider et parser selectedBankId
+      const parsedBankId = parseInt(selectedBankId, 10);
+      if (isNaN(parsedBankId) || parsedBankId <= 0) {
+        return res.status(400).json({
+          message: "ID de banque invalide",
+        });
+      }
+
       // Vérifier que l'utilisateur a accès à cette banque
       const userBank = await prisma.userBank.findFirst({
         where: {
           userId: userId,
-          bankId: parseInt(selectedBankId),
+          bankId: parsedBankId,
         },
         include: {
           bank: true,
