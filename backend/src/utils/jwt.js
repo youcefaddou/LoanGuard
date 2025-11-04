@@ -12,7 +12,7 @@ const generateToken = (user) => {
     payload, 
     process.env.JWT_SECRET, 
     { 
-      expiresIn: '24h',
+      expiresIn: '8h',
       issuer: 'loanguard-api',
       audience: 'loanguard-app'
     }
