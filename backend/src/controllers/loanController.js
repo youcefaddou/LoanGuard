@@ -43,6 +43,15 @@ exports.createLoan = async (req, res) => {
       (amount * monthlyRate * Math.pow(1 + monthlyRate, duration)) /
       (Math.pow(1 + monthlyRate, duration) - 1);
 
+    // Sécurité: Empêcher les paiements mensuels de moins de 0.06$
+    const roundedMonthlyPayment = Math.round(monthlyPayment * 100) / 100;
+    if (roundedMonthlyPayment < 0.06) {
+      return res.status(400).json({
+        message: "Le montant du paiement mensuel doit être d'au moins 0,06$",
+        monthlyPayment: roundedMonthlyPayment
+      });
+    }
+
     const newLoan = await prisma.loan.create({
       data: {
         userId: req.user.id,
@@ -54,7 +63,7 @@ exports.createLoan = async (req, res) => {
         startDate: new Date(startDate),
         dueDate,
         status,
-        monthlyPayment: Math.round(monthlyPayment * 100) / 100,
+        monthlyPayment: roundedMonthlyPayment,
       },
       include: {
         company: true,

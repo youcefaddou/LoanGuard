@@ -3,6 +3,12 @@ const prisma = new PrismaClient();
 
 const generatePaymentHistory = async (loan) => {
   try {
+    // Sécurité: Empêcher les paiements de moins de 0.06$
+    if (loan.monthlyPayment < 0.06) {
+      console.error("Sécurité: Impossible de générer des paiements de moins de 0,06$");
+      return;
+    }
+
     const payments = [];
     let currentDate = new Date(loan.startDate);
     const today = new Date();
